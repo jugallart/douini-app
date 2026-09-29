@@ -1,0 +1,55 @@
+{
+  "source": "half",
+  "workouts": [
+    {
+      "id": "HM-3x3000", "description": "3x3000m seuil", "category": "quality", "zone": "MEDIUM",
+      "structure": "distance", "reps": 3, "interval_m": 3000, "pace_key": "threshold",
+      "rec_sec": 180, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["HM"],
+      "phases": ["BUILD", "SPECIFIC", "PEAK"],
+      "load": 9, "fatigue": 8, "specificity": 0.85, "recovery_hours": 36,
+      "race_proximity": "not-pre-race", "repetition_penalty": 2
+    },
+    {
+      "id": "HM-2x5000", "description": "2x5000m seuil", "category": "quality", "zone": "LONG",
+      "structure": "distance", "reps": 2, "interval_m": 5000, "pace_key": "threshold",
+      "rec_sec": 240, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["HM"],
+      "phases": ["SPECIFIC", "PEAK"],
+      "load": 10, "fatigue": 9, "specificity": 0.9, "recovery_hours": 36,
+      "race_proximity": "not-pre-race", "repetition_penalty": 3
+    },
+    {
+      "id": "HM-LONG-TEMPO", "description": "Tempo long 8km", "category": "quality", "zone": "LONG",
+      "structure": "distance", "reps": 1, "interval_m": 8000, "pace_key": "HM",
+      "rec_sec": 0, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["HM"],
+      "phases": ["SPECIFIC", "PEAK"],
+      "load": 9, "fatigue": 8, "specificity": 0.9, "recovery_hours": 36,
+      "race_proximity": "not-pre-race", "repetition_penalty": 3
+    },
+    {
+      "id": "HM-PROGRESSIVE-LONG", "description": "Sortie longue progressive", "category": "long_run",
+      "structure": "progressive", "reps": 3, "interval_sec": 720, "pace_key": "long_run",
+      "rec_sec": 90, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["HM"],
+      "phases": ["BUILD", "SPECIFIC"],
+      "load": 8, "fatigue": 7, "specificity": 0.7, "recovery_hours": 36,
+      "race_proximity": "not-pre-race", "repetition_penalty": 2
+    },
+    {
+      "id": "HM-RACE-BLOCKS", "description": "Blocs specifiques semi", "category": "quality", "zone": "LONG",
+      "structure": "variable", "reps": 3, "interval_sec": 0, "pace_key": "HM",
+      "rec_sec": 120, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "blocks": [
+        {"sec": 600, "pace_key": "threshold"},
+        {"sec": 720, "pace_key": "HM"},
+        {"sec": 600, "pace_key": "HM"}
+      ],
+      "distances": ["HM"],
+      "phases": ["SPECIFIC", "PEAK"],
+      "load": 10, "fatigue": 9, "specificity": 0.9, "recovery_hours": 36,
+      "race_proximity": "not-pre-race", "repetition_penalty": 3
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "Douini Run",
+    "slug": "douini-run",
+    "scheme": "douini",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#2563eb"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.douini.run"
+    },
+    "android": {
+      "package": "com.douini.run"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

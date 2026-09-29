@@ -1,0 +1,46 @@
+{
+  "distances": {
+    "5K": {
+      "name": "5 km",
+      "metres": 5000,
+      "volume_target_km": 65,
+      "volume_tolerance_km": 5,
+      "long_run_cap_km": 18,
+      "quality_session_count": 2,
+      "taper_weeks": 1
+    },
+    "10K": {
+      "name": "10 km",
+      "metres": 10000,
+      "volume_target_km": 70,
+      "volume_tolerance_km": 5,
+      "long_run_cap_km": 22,
+      "quality_session_count": 2,
+      "taper_weeks": 1
+    },
+    "HM": {
+      "name": "Semi-marathon",
+      "metres": 21097.5,
+      "volume_target_km": 75,
+      "volume_tolerance_km": 5,
+      "long_run_cap_km": 28,
+      "quality_session_count": 2,
+      "taper_weeks": 2
+    },
+    "MARATHON": {
+      "name": "Marathon",
+      "metres": 42195.0,
+      "volume_target_km": 78,
+      "volume_tolerance_km": 5,
+      "long_run_cap_km": 32,
+      "quality_session_count": 2,
+      "taper_weeks": 3
+    }
+  },
+  "compat_aliases": {
+    "5k": "5K",
+    "10k": "10K",
+    "semi": "HM",
+    "marathon": "MARATHON"
+  }
+}

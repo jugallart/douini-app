@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-douini}
+      POSTGRES_USER: ${POSTGRES_USER:-douini}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-douini}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-douini} -d ${POSTGRES_DB:-douini}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.backend
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-ppe}
+      DEBUG: ${DEBUG:-false}
+      SECRET_KEY: ${SECRET_KEY}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-douini}:${POSTGRES_PASSWORD:-douini}@postgres:5432/${POSTGRES_DB:-douini}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-noreply@douini.run}
+      FRONTEND_URL: ${FRONTEND_URL:-https://douini.run}
+      DOUINI_ENCRYPTION_KEY: ${DOUINI_ENCRYPTION_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.web
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      CADDY_HOST: ${CADDY_HOST:-localhost}
+    depends_on:
+      - backend
+      - web
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:

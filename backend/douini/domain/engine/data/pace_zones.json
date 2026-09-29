@@ -1,0 +1,14 @@
+{
+  "garmin_encoding": {
+    "unit": "metres_per_second",
+    "formula": "1000 / pace_s_per_km",
+    "bound_order": "fast_first"
+  },
+  "easy": {"fast_factor": 1.30, "slow_factor": 1.45, "reference": "E"},
+  "recovery": {"fast_factor": 1.45, "slow_factor": 1.60, "reference": "REC"},
+  "long_run": {"fast_factor": 1.20, "slow_factor": 1.35, "reference": "LR"},
+  "threshold": {"fast_factor": 0.97, "slow_factor": 1.03, "reference": "T"},
+  "vo2": {"fast_factor": 0.89, "slow_factor": 0.95, "reference": "VO2"},
+  "economy": {"fast_factor": 0.82, "slow_factor": 0.88, "reference": "ECON"},
+  "tolerance_seconds": 3
+}

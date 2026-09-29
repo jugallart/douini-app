@@ -1,0 +1,148 @@
+{
+  "source": "common",
+  "workouts": [
+    {
+      "id": "EASY-30", "description": "EF 30min", "category": "easy",
+      "structure": "time", "pace_key": "easy",
+      "duration_sec": 1800, "warmup_sec": 0, "cooldown_sec": 0,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BASE", "BUILD", "SPECIFIC", "PEAK", "TAPER"],
+      "load": 2, "fatigue": 1, "specificity": 0.1, "recovery_hours": 8,
+      "race_proximity": "all", "repetition_penalty": 0
+    },
+    {
+      "id": "EASY-45", "description": "EF 45min", "category": "easy",
+      "structure": "time", "pace_key": "easy",
+      "duration_sec": 2700, "warmup_sec": 0, "cooldown_sec": 0,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BASE", "BUILD", "SPECIFIC", "PEAK", "TAPER"],
+      "load": 3, "fatigue": 2, "specificity": 0.1, "recovery_hours": 8,
+      "race_proximity": "all", "repetition_penalty": 0
+    },
+    {
+      "id": "EASY-60", "description": "EF 60min", "category": "easy",
+      "structure": "time", "pace_key": "easy",
+      "duration_sec": 3600, "warmup_sec": 0, "cooldown_sec": 0,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BASE", "BUILD", "SPECIFIC", "PEAK", "TAPER"],
+      "load": 4, "fatigue": 2, "specificity": 0.1, "recovery_hours": 8,
+      "race_proximity": "all", "repetition_penalty": 0
+    },
+    {
+      "id": "EASY-75", "description": "EF 75min", "category": "easy",
+      "structure": "time", "pace_key": "easy",
+      "duration_sec": 4500, "warmup_sec": 0, "cooldown_sec": 0,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BASE", "BUILD", "SPECIFIC", "PEAK"],
+      "load": 5, "fatigue": 3, "specificity": 0.1, "recovery_hours": 10,
+      "race_proximity": "all", "repetition_penalty": 0
+    },
+    {
+      "id": "RECOVERY-30", "description": "Recuperation 30min", "category": "recovery",
+      "structure": "time", "pace_key": "recovery",
+      "duration_sec": 1800, "warmup_sec": 0, "cooldown_sec": 0,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BASE", "BUILD", "SPECIFIC", "PEAK", "TAPER"],
+      "load": 1, "fatigue": 0, "specificity": 0.0, "recovery_hours": 4,
+      "race_proximity": "all", "repetition_penalty": 0
+    },
+    {
+      "id": "LONG-EASY", "description": "Sortie longue EF", "category": "long_run",
+      "structure": "distance", "pace_key": "long_run",
+      "distance_m": 0, "warmup_sec": 0, "cooldown_sec": 0,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BASE", "BUILD", "SPECIFIC", "PEAK"],
+      "load": 5, "fatigue": 4, "specificity": 0.2, "recovery_hours": 24,
+      "race_proximity": "all", "repetition_penalty": 0
+    },
+    {
+      "id": "LONG-MP-BLOCKS", "description": "Sortie longue avec blocs MP", "category": "long_run",
+      "structure": "variable", "pace_key": "long_run",
+      "reps": 3, "interval_sec": 0, "rec_sec": 180,
+      "warmup_sec": 1200, "cooldown_sec": 1200,
+      "blocks": [
+        {"sec": 600, "pace_key": "long_run"},
+        {"sec": 600, "pace_key": "MARATHON"},
+        {"sec": 600, "pace_key": "long_run"}
+      ],
+      "distances": ["MARATHON"],
+      "phases": ["SPECIFIC", "PEAK"],
+      "load": 8, "fatigue": 7, "specificity": 0.8, "recovery_hours": 36,
+      "race_proximity": "not-pre-race", "repetition_penalty": 2
+    },
+    {
+      "id": "STRIDES", "description": "6x100m", "category": "secondary",
+      "structure": "distance", "pace_key": "vo2",
+      "reps": 6, "interval_m": 100, "rec_sec": 60,
+      "warmup_sec": 1200, "cooldown_sec": 600,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BASE", "BUILD", "SPECIFIC", "PEAK", "TAPER"],
+      "load": 3, "fatigue": 3, "specificity": 0.3, "recovery_hours": 6,
+      "race_proximity": "all", "repetition_penalty": 0
+    },
+    {
+      "id": "TAPER-EASY-30", "description": "EF 30min (taper)", "category": "taper",
+      "structure": "time", "pace_key": "easy",
+      "duration_sec": 1800, "warmup_sec": 0, "cooldown_sec": 0,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["TAPER"],
+      "load": 2, "fatigue": 1, "specificity": 0.1, "recovery_hours": 8,
+      "race_proximity": "pre-race", "repetition_penalty": 0
+    },
+    {
+      "id": "TAPER-EASY-45", "description": "EF 45min (taper)", "category": "taper",
+      "structure": "time", "pace_key": "easy",
+      "duration_sec": 2700, "warmup_sec": 0, "cooldown_sec": 0,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["TAPER"],
+      "load": 2, "fatigue": 1, "specificity": 0.1, "recovery_hours": 8,
+      "race_proximity": "pre-race", "repetition_penalty": 0
+    },
+    {
+      "id": "TAPER-STRIDES", "description": "4x100m (taper)", "category": "taper",
+      "structure": "distance", "pace_key": "vo2",
+      "reps": 4, "interval_m": 100, "rec_sec": 60,
+      "warmup_sec": 1200, "cooldown_sec": 600,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["TAPER"],
+      "load": 2, "fatigue": 2, "specificity": 0.3, "recovery_hours": 6,
+      "race_proximity": "pre-race", "repetition_penalty": 0
+    },
+    {
+      "id": "RACE-5K", "description": "Course 5K", "category": "race",
+      "structure": "distance", "pace_key": "5K",
+      "distance_m": 5000, "warmup_sec": 1200, "cooldown_sec": 600,
+      "distances": ["5K"],
+      "phases": ["TAPER"],
+      "load": 10, "fatigue": 10, "specificity": 1.0, "recovery_hours": 48,
+      "race_proximity": "pre-race", "repetition_penalty": 0
+    },
+    {
+      "id": "RACE-10K", "description": "Course 10K", "category": "race",
+      "structure": "distance", "pace_key": "10K",
+      "distance_m": 10000, "warmup_sec": 1200, "cooldown_sec": 600,
+      "distances": ["10K"],
+      "phases": ["TAPER"],
+      "load": 10, "fatigue": 10, "specificity": 1.0, "recovery_hours": 48,
+      "race_proximity": "pre-race", "repetition_penalty": 0
+    },
+    {
+      "id": "RACE-HM", "description": "Course Semi-Marathon", "category": "race",
+      "structure": "distance", "pace_key": "HM",
+      "distance_m": 21097, "warmup_sec": 1200, "cooldown_sec": 600,
+      "distances": ["HM"],
+      "phases": ["TAPER"],
+      "load": 10, "fatigue": 10, "specificity": 1.0, "recovery_hours": 72,
+      "race_proximity": "pre-race", "repetition_penalty": 0
+    },
+    {
+      "id": "RACE-MARATHON", "description": "Course Marathon", "category": "race",
+      "structure": "distance", "pace_key": "MARATHON",
+      "distance_m": 42195, "warmup_sec": 1200, "cooldown_sec": 600,
+      "distances": ["MARATHON"],
+      "phases": ["TAPER"],
+      "load": 10, "fatigue": 10, "specificity": 1.0, "recovery_hours": 96,
+      "race_proximity": "pre-race", "repetition_penalty": 0
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "difficulty_factors": {
+    "comfortable": 0.90,
+    "balanced": 1.00,
+    "demanding": 1.10
+  },
+  "volume_strategies": {
+    "gradual": {
+      "weekly_increase_pct": 3,
+      "max_consecutive_increase_weeks": 2,
+      "description": "Progression douce et faible perturbation"
+    },
+    "constant": {
+      "weekly_increase_pct": 0,
+      "max_consecutive_increase_weeks": 0,
+      "description": "Volume stable, progression qualitative"
+    },
+    "progressive": {
+      "weekly_increase_pct": 5,
+      "max_consecutive_increase_weeks": 3,
+      "description": "Progression ambitieuse orientee performance"
+    }
+  }
+}

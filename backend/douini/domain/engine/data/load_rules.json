@@ -1,0 +1,13 @@
+{
+  "weekly_load_factor": 1.0,
+  "recovery_load_factor": 0.75,
+  "taper_load_factor": 0.60,
+  "long_run_ratio": {
+    "5K": 0.25,
+    "10K": 0.28,
+    "HM": 0.30,
+    "MARATHON": 0.33
+  },
+  "max_weekly_increase_pct": 10,
+  "max_recovery_decrease_pct": 25
+}

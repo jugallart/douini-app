@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: douini
+          POSTGRES_USER: douini
+          POSTGRES_PASSWORD: douini
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U douini -d douini"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        working-directory: backend
+        run: |
+          pip install -e ".[dev]"
+      - name: Test
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql+psycopg://douini:douini@localhost:5432/douini
+        run: pytest tests/ -q
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Build shared
+        run: npm run build --workspace @douini/shared
+      - name: Typecheck web
+        run: npx tsc --noEmit --project web/tsconfig.json
+      - name: Typecheck mobile
+        run: npx tsc --noEmit --project mobile/tsconfig.json

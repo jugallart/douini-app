@@ -1,0 +1,15 @@
+{
+  "density_progression": {
+    "method": "density",
+    "description": "Add work time in same session duration, not more volume"
+  },
+  "volume_progression": {
+    "weekly_increase_pct": 5,
+    "max_consecutive_increase_weeks": 3,
+    "recovery_week_reduction_pct": 20
+  },
+  "long_run_progression": {
+    "weekly_increase_km": 2,
+    "max_consecutive_increase_weeks": 3
+  }
+}

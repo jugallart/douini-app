@@ -1,0 +1,47 @@
+{
+  "source": "marathon",
+  "workouts": [
+    {
+      "id": "MAR-MP-BLOCKS", "description": "3x2km MP", "category": "quality", "zone": "LONG",
+      "structure": "distance", "reps": 3, "interval_m": 2000, "pace_key": "MARATHON",
+      "rec_sec": 180, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["MARATHON"],
+      "phases": ["SPECIFIC", "PEAK"],
+      "load": 8, "fatigue": 7, "specificity": 0.85, "recovery_hours": 36,
+      "race_proximity": "not-pre-race", "repetition_penalty": 2
+    },
+    {
+      "id": "MAR-PROGRESSIVE-LONG", "description": "Sortie longue progressive", "category": "long_run",
+      "structure": "progressive", "reps": 3, "interval_sec": 720, "pace_key": "long_run",
+      "rec_sec": 90, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["MARATHON"],
+      "phases": ["BUILD", "SPECIFIC"],
+      "load": 8, "fatigue": 7, "specificity": 0.7, "recovery_hours": 36,
+      "race_proximity": "not-pre-race", "repetition_penalty": 2
+    },
+    {
+      "id": "MAR-LONG-MP", "description": "Sortie longue avec blocs MP", "category": "long_run",
+      "structure": "variable", "reps": 3, "interval_sec": 0, "pace_key": "long_run",
+      "rec_sec": 180, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "blocks": [
+        {"sec": 600, "pace_key": "long_run"},
+        {"sec": 600, "pace_key": "MARATHON"},
+        {"sec": 600, "pace_key": "long_run"},
+        {"sec": 600, "pace_key": "MARATHON"}
+      ],
+      "distances": ["MARATHON"],
+      "phases": ["SPECIFIC", "PEAK"],
+      "load": 9, "fatigue": 8, "specificity": 0.85, "recovery_hours": 36,
+      "race_proximity": "not-pre-race", "repetition_penalty": 2
+    },
+    {
+      "id": "MAR-AEROBIC-THRESHOLD", "description": "2x5km seuil aerobie", "category": "quality", "zone": "LONG",
+      "structure": "distance", "reps": 2, "interval_m": 5000, "pace_key": "threshold",
+      "rec_sec": 240, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["MARATHON"],
+      "phases": ["BUILD", "SPECIFIC"],
+      "load": 9, "fatigue": 8, "specificity": 0.75, "recovery_hours": 36,
+      "race_proximity": "not-pre-race", "repetition_penalty": 2
+    }
+  ]
+}

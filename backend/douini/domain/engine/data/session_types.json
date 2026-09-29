@@ -1,0 +1,12 @@
+{
+  "categories": [
+    {"id": "QUALITY", "pace_key": "threshold", "default_day": "Mon"},
+    {"id": "EASY", "pace_key": "easy", "default_day": "Wed"},
+    {"id": "SECONDARY", "pace_key": "threshold", "default_day": "Fri"},
+    {"id": "LONG_RUN", "pace_key": "long_run", "default_day": "Sun"}
+  ],
+  "min_quality_sessions": 2,
+  "max_quality_sessions": 3,
+  "default_training_days": ["Mon", "Wed", "Fri", "Sun"],
+  "supported_day_counts": [3, 4, 5, 6, 7]
+}

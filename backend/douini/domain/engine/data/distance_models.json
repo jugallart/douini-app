@@ -1,0 +1,19 @@
+{
+  "distances": [
+    {"id": "1500", "name": "1500 m", "metres": 1500},
+    {"id": "3000", "name": "3 km", "metres": 3000},
+    {"id": "5K", "name": "5 km", "metres": 5000},
+    {"id": "10K", "name": "10 km", "metres": 10000},
+    {"id": "15K", "name": "15 km", "metres": 15000},
+    {"id": "HM", "name": "Semi-marathon", "metres": 21097.5},
+    {"id": "25K", "name": "25 km", "metres": 25000},
+    {"id": "30K", "name": "30 km", "metres": 30000},
+    {"id": "MARATHON", "name": "Marathon", "metres": 42195.0}
+  ],
+  "compat_aliases": {
+    "5k": "5K",
+    "10k": "10K",
+    "semi": "HM",
+    "marathon": "MARATHON"
+  }
+}

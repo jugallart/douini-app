@@ -1,0 +1,187 @@
+{
+  "source": "norwegian",
+  "workouts": [
+    {
+      "id": "NS-S01", "description": "10x3'", "category": "quality", "zone": "SHORT",
+      "structure": "uniform", "reps": 10, "interval_sec": 180, "pace_key": "short",
+      "rec_sec": 60, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BASE", "BUILD", "SPECIFIC", "PEAK"],
+      "load": 7, "fatigue": 6, "specificity": 0.5, "recovery_hours": 24,
+      "race_proximity": "all", "repetition_penalty": 2
+    },
+    {
+      "id": "NS-S02", "description": "9x3'30\"", "category": "quality", "zone": "SHORT",
+      "structure": "uniform", "reps": 9, "interval_sec": 210, "pace_key": "short",
+      "rec_sec": 60, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BASE", "BUILD", "SPECIFIC", "PEAK"],
+      "load": 7, "fatigue": 6, "specificity": 0.5, "recovery_hours": 24,
+      "race_proximity": "all", "repetition_penalty": 2
+    },
+    {
+      "id": "NS-S03", "description": "8x4'", "category": "quality", "zone": "SHORT",
+      "structure": "uniform", "reps": 8, "interval_sec": 240, "pace_key": "short",
+      "rec_sec": 60, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BASE", "BUILD", "SPECIFIC", "PEAK"],
+      "load": 8, "fatigue": 7, "specificity": 0.55, "recovery_hours": 24,
+      "race_proximity": "all", "repetition_penalty": 2
+    },
+    {
+      "id": "NS-S04", "description": "pyramidal 3'/3'/4'/4'/3'/3'", "category": "quality", "zone": "SHORT",
+      "structure": "variable", "reps": 6, "interval_sec": 0, "pace_key": "short",
+      "rec_sec": 60, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "blocks": [
+        {"sec": 180, "pace_key": "short"},
+        {"sec": 180, "pace_key": "short"},
+        {"sec": 240, "pace_key": "long"},
+        {"sec": 240, "pace_key": "long"},
+        {"sec": 180, "pace_key": "short"},
+        {"sec": 180, "pace_key": "short"}
+      ],
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BUILD", "SPECIFIC", "PEAK"],
+      "load": 8, "fatigue": 7, "specificity": 0.6, "recovery_hours": 24,
+      "race_proximity": "all", "repetition_penalty": 2
+    },
+    {
+      "id": "NS-S05", "description": "12x3' (dense)", "category": "quality", "zone": "SHORT",
+      "structure": "uniform", "reps": 12, "interval_sec": 180, "pace_key": "short",
+      "rec_sec": 60, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BUILD", "SPECIFIC", "PEAK"],
+      "load": 9, "fatigue": 8, "specificity": 0.6, "recovery_hours": 24,
+      "race_proximity": "all", "repetition_penalty": 3
+    },
+    {
+      "id": "NS-S06", "description": "progressif 2x4x3'", "category": "quality", "zone": "SHORT",
+      "structure": "progressive", "reps": 8, "interval_sec": 180, "pace_key": "short",
+      "rec_sec": 60, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["SPECIFIC", "PEAK"],
+      "load": 9, "fatigue": 8, "specificity": 0.65, "recovery_hours": 24,
+      "race_proximity": "all", "repetition_penalty": 3
+    },
+    {
+      "id": "NS-M01", "description": "5x6'", "category": "quality", "zone": "MEDIUM",
+      "structure": "uniform", "reps": 5, "interval_sec": 360, "pace_key": "medium",
+      "rec_sec": 60, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BASE", "BUILD", "SPECIFIC", "PEAK"],
+      "load": 7, "fatigue": 6, "specificity": 0.5, "recovery_hours": 24,
+      "race_proximity": "all", "repetition_penalty": 2
+    },
+    {
+      "id": "NS-M02", "description": "4x7'", "category": "quality", "zone": "MEDIUM",
+      "structure": "uniform", "reps": 4, "interval_sec": 420, "pace_key": "medium",
+      "rec_sec": 60, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BASE", "BUILD", "SPECIFIC", "PEAK"],
+      "load": 8, "fatigue": 7, "specificity": 0.55, "recovery_hours": 24,
+      "race_proximity": "all", "repetition_penalty": 2
+    },
+    {
+      "id": "NS-M03", "description": "5x7'", "category": "quality", "zone": "MEDIUM",
+      "structure": "uniform", "reps": 5, "interval_sec": 420, "pace_key": "medium",
+      "rec_sec": 60, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BASE", "BUILD", "SPECIFIC", "PEAK"],
+      "load": 8, "fatigue": 7, "specificity": 0.55, "recovery_hours": 24,
+      "race_proximity": "all", "repetition_penalty": 2
+    },
+    {
+      "id": "NS-M04", "description": "4x8'", "category": "quality", "zone": "MEDIUM",
+      "structure": "uniform", "reps": 4, "interval_sec": 480, "pace_key": "medium",
+      "rec_sec": 60, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BUILD", "SPECIFIC", "PEAK"],
+      "load": 9, "fatigue": 8, "specificity": 0.6, "recovery_hours": 24,
+      "race_proximity": "all", "repetition_penalty": 2
+    },
+    {
+      "id": "NS-M05", "description": "6x6' (dense)", "category": "quality", "zone": "MEDIUM",
+      "structure": "uniform", "reps": 6, "interval_sec": 360, "pace_key": "medium",
+      "rec_sec": 60, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BUILD", "SPECIFIC", "PEAK"],
+      "load": 9, "fatigue": 8, "specificity": 0.6, "recovery_hours": 24,
+      "race_proximity": "all", "repetition_penalty": 3
+    },
+    {
+      "id": "NS-M06", "description": "8-7-6-7-8' mixte", "category": "quality", "zone": "MEDIUM",
+      "structure": "variable", "reps": 5, "interval_sec": 0, "pace_key": "medium",
+      "rec_sec": 60, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "blocks": [
+        {"sec": 480, "pace_key": "medium"},
+        {"sec": 420, "pace_key": "medium"},
+        {"sec": 360, "pace_key": "medium"},
+        {"sec": 420, "pace_key": "medium"},
+        {"sec": 480, "pace_key": "medium"}
+      ],
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BUILD", "SPECIFIC", "PEAK"],
+      "load": 9, "fatigue": 8, "specificity": 0.6, "recovery_hours": 24,
+      "race_proximity": "all", "repetition_penalty": 3
+    },
+    {
+      "id": "NS-L01", "description": "3x10'", "category": "quality", "zone": "LONG",
+      "structure": "uniform", "reps": 3, "interval_sec": 600, "pace_key": "long",
+      "rec_sec": 90, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BASE", "BUILD", "SPECIFIC", "PEAK"],
+      "load": 8, "fatigue": 7, "specificity": 0.5, "recovery_hours": 36,
+      "race_proximity": "all", "repetition_penalty": 2
+    },
+    {
+      "id": "NS-L02", "description": "3x11'", "category": "quality", "zone": "LONG",
+      "structure": "uniform", "reps": 3, "interval_sec": 660, "pace_key": "long",
+      "rec_sec": 90, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BASE", "BUILD", "SPECIFIC", "PEAK"],
+      "load": 8, "fatigue": 7, "specificity": 0.55, "recovery_hours": 36,
+      "race_proximity": "all", "repetition_penalty": 2
+    },
+    {
+      "id": "NS-L03", "description": "3x12'", "category": "quality", "zone": "LONG",
+      "structure": "uniform", "reps": 3, "interval_sec": 720, "pace_key": "long",
+      "rec_sec": 90, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BUILD", "SPECIFIC", "PEAK"],
+      "load": 9, "fatigue": 8, "specificity": 0.6, "recovery_hours": 36,
+      "race_proximity": "all", "repetition_penalty": 2
+    },
+    {
+      "id": "NS-L04", "description": "2x15'", "category": "quality", "zone": "LONG",
+      "structure": "uniform", "reps": 2, "interval_sec": 900, "pace_key": "long",
+      "rec_sec": 120, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["SPECIFIC", "PEAK"],
+      "load": 10, "fatigue": 9, "specificity": 0.65, "recovery_hours": 36,
+      "race_proximity": "all", "repetition_penalty": 3
+    },
+    {
+      "id": "NS-L05", "description": "10-12-10'", "category": "quality", "zone": "LONG",
+      "structure": "variable", "reps": 3, "interval_sec": 0, "pace_key": "long",
+      "rec_sec": 90, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "blocks": [
+        {"sec": 600, "pace_key": "long"},
+        {"sec": 720, "pace_key": "long"},
+        {"sec": 600, "pace_key": "long"}
+      ],
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["BUILD", "SPECIFIC", "PEAK"],
+      "load": 9, "fatigue": 8, "specificity": 0.6, "recovery_hours": 36,
+      "race_proximity": "all", "repetition_penalty": 3
+    },
+    {
+      "id": "NS-L06", "description": "3x12' progressif", "category": "quality", "zone": "LONG",
+      "structure": "progressive", "reps": 3, "interval_sec": 720, "pace_key": "long",
+      "rec_sec": 90, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K", "10K", "HM", "MARATHON"],
+      "phases": ["SPECIFIC", "PEAK"],
+      "load": 10, "fatigue": 9, "specificity": 0.65, "recovery_hours": 36,
+      "race_proximity": "all", "repetition_penalty": 3
+    }
+  ]
+}

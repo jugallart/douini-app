@@ -1,0 +1,17 @@
+{
+  "checks": [
+    {"id": "volume_ceiling", "description": "Weekly volume within target + tolerance", "severity": "warning"},
+    {"id": "long_run_cap", "description": "Long run within distance cap", "severity": "warning"},
+    {"id": "quality_session_count", "description": "2-3 quality sessions per week", "severity": "warning"},
+    {"id": "recovery_week_volume", "description": "Recovery week reduces volume", "severity": "error"},
+    {"id": "taper_volume", "description": "Taper weeks reduce volume progressively", "severity": "error"},
+    {"id": "session_spacing", "description": "Quality sessions separated by 24h+", "severity": "warning"},
+    {"id": "long_run_day", "description": "Long run on designated day", "severity": "info"},
+    {"id": "norwegian_zone_match", "description": "Workout zone matches planned intensity", "severity": "warning"},
+    {"id": "vdot_feasibility", "description": "Goal VDOT within configured gap", "severity": "warning"},
+    {"id": "pace_ordering", "description": "Pace zones ordered correctly (vo2 < threshold < easy)", "severity": "warning"},
+    {"id": "workout_classification", "description": "Workout pace_key matches its method (NS vs race-specific)", "severity": "warning"},
+    {"id": "phase_specificity", "description": "Workouts appear in phases they are tagged for", "severity": "warning"}
+  ],
+  "pace_overlap_tolerance_seconds": 3
+}

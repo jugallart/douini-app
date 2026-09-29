@@ -1,0 +1,15 @@
+{
+  "phases": [
+    {"id": "BASE", "label_fr": "Adaptation", "default_weeks_pct": 0.33, "intensity": "low"},
+    {"id": "BUILD", "label_fr": "Accumulation", "default_weeks_pct": 0.33, "intensity": "moderate"},
+    {"id": "SPECIFIC", "label_fr": "Developpement", "default_weeks_pct": 0.34, "intensity": "high"},
+    {"id": "PEAK", "label_fr": "Pic", "default_weeks_pct": 0.0, "intensity": "peak"},
+    {"id": "TAPER", "label_fr": "Affutage", "default_weeks_pct": 0.0, "intensity": "taper"}
+  ],
+  "compat_labels": {
+    "Adaptation": "BASE",
+    "Accumulation": "BUILD",
+    "Developpement": "SPECIFIC"
+  },
+  "recovery_weeks": [4, 8, 12]
+}

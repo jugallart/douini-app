@@ -1,0 +1,86 @@
+{
+  "source": "5k",
+  "workouts": [
+    {
+      "id": "5K-6x800", "description": "6x800m", "category": "quality", "zone": "SHORT",
+      "structure": "distance", "reps": 6, "interval_m": 800, "pace_key": "5K",
+      "rec_sec": 90, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K"],
+      "phases": ["SPECIFIC", "PEAK"],
+      "load": 8, "fatigue": 7, "specificity": 0.9, "recovery_hours": 24,
+      "race_proximity": "not-pre-race", "repetition_penalty": 2
+    },
+    {
+      "id": "5K-5x1000", "description": "5x1000m", "category": "quality", "zone": "SHORT",
+      "structure": "distance", "reps": 5, "interval_m": 1000, "pace_key": "5K",
+      "rec_sec": 90, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K"],
+      "phases": ["SPECIFIC", "PEAK"],
+      "load": 8, "fatigue": 7, "specificity": 0.9, "recovery_hours": 24,
+      "race_proximity": "not-pre-race", "repetition_penalty": 2
+    },
+    {
+      "id": "5K-4x1200", "description": "4x1200m", "category": "quality", "zone": "SHORT",
+      "structure": "distance", "reps": 4, "interval_m": 1200, "pace_key": "5K",
+      "rec_sec": 120, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K"],
+      "phases": ["SPECIFIC", "PEAK"],
+      "load": 9, "fatigue": 8, "specificity": 0.9, "recovery_hours": 24,
+      "race_proximity": "not-pre-race", "repetition_penalty": 2
+    },
+    {
+      "id": "5K-3x1600", "description": "3x1600m", "category": "quality", "zone": "SHORT",
+      "structure": "distance", "reps": 3, "interval_m": 1600, "pace_key": "5K",
+      "rec_sec": 120, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K"],
+      "phases": ["PEAK"],
+      "load": 9, "fatigue": 8, "specificity": 0.95, "recovery_hours": 24,
+      "race_proximity": "not-pre-race", "repetition_penalty": 3
+    },
+    {
+      "id": "5K-6x600", "description": "6x600m", "category": "quality", "zone": "SHORT",
+      "structure": "distance", "reps": 6, "interval_m": 600, "pace_key": "5K",
+      "rec_sec": 75, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K"],
+      "phases": ["SPECIFIC", "PEAK"],
+      "load": 7, "fatigue": 6, "specificity": 0.85, "recovery_hours": 24,
+      "race_proximity": "not-pre-race", "repetition_penalty": 2
+    },
+    {
+      "id": "5K-8x400", "description": "8x400m", "category": "quality", "zone": "SHORT",
+      "structure": "distance", "reps": 8, "interval_m": 400, "pace_key": "vo2",
+      "rec_sec": 60, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K"],
+      "phases": ["SPECIFIC", "PEAK"],
+      "load": 6, "fatigue": 5, "specificity": 0.8, "recovery_hours": 18,
+      "race_proximity": "all", "repetition_penalty": 2
+    },
+    {
+      "id": "5K-10x400", "description": "10x400m", "category": "quality", "zone": "SHORT",
+      "structure": "distance", "reps": 10, "interval_m": 400, "pace_key": "vo2",
+      "rec_sec": 60, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K"],
+      "phases": ["PEAK"],
+      "load": 7, "fatigue": 6, "specificity": 0.85, "recovery_hours": 18,
+      "race_proximity": "all", "repetition_penalty": 2
+    },
+    {
+      "id": "5K-12x300", "description": "12x300m", "category": "quality", "zone": "SHORT",
+      "structure": "distance", "reps": 12, "interval_m": 300, "pace_key": "vo2",
+      "rec_sec": 45, "warmup_sec": 1200, "cooldown_sec": 1200,
+      "distances": ["5K"],
+      "phases": ["PEAK"],
+      "load": 7, "fatigue": 6, "specificity": 0.85, "recovery_hours": 18,
+      "race_proximity": "all", "repetition_penalty": 3
+    },
+    {
+      "id": "5K-6x200", "description": "6x200m", "category": "secondary", "zone": "SHORT",
+      "structure": "distance", "reps": 6, "interval_m": 200, "pace_key": "vo2",
+      "rec_sec": 45, "warmup_sec": 1200, "cooldown_sec": 600,
+      "distances": ["5K", "10K"],
+      "phases": ["SPECIFIC", "PEAK", "TAPER"],
+      "load": 4, "fatigue": 3, "specificity": 0.6, "recovery_hours": 12,
+      "race_proximity": "all", "repetition_penalty": 1
+    }
+  ]
+}
