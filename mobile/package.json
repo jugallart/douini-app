@@ -17,13 +17,13 @@
     "expo-constants": "~17.0",
     "expo-linking": "~7.0",
     "@expo/vector-icons": "^14.0",
-    "react": "18.3.1",
+    "react": "19.3.0",
     "react-native": "0.76.7",
     "@tanstack/react-query": "^5.60",
     "@douini/shared": "*"
   },
   "devDependencies": {
-    "@types/react": "~18.3",
+    "@types/react": "~19.3",
     "typescript": "^5.6"
   }
 }
