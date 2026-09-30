@@ -5,6 +5,7 @@ from psycopg import AsyncConnection
 
 from douini.api.dependencies import get_db, get_verified_user
 from douini.db.queries import plans as plans_q
+from douini.services import adjustment as adjustment_svc
 from douini.services import plan as plan_svc
 from douini.services import refresh as refresh_svc
 
@@ -89,3 +90,79 @@ async def decline_refresh(
     await refresh_svc.decline_refresh(conn, plan_id)
     await conn.commit()
     return {"status": "declined"}
+
+
+@router.get("/{plan_id}/review-queue")
+async def get_review_queue(
+    plan_id: int,
+    user: dict = Depends(get_verified_user),
+    conn: AsyncConnection = Depends(get_db),
+):
+    plan = await plans_q.get_plan(conn, plan_id, user["id"])
+    if not plan:
+        raise HTTPException(404, "Plan not found")
+    return await plans_q.get_review_queue(conn, plan_id)
+
+
+@router.post("/{plan_id}/adjustments/{adjustment_id}/reject")
+async def reject_adjustment(
+    plan_id: int,
+    adjustment_id: int,
+    user: dict = Depends(get_verified_user),
+    conn: AsyncConnection = Depends(get_db),
+):
+    try:
+        result = await adjustment_svc.reject_adjustment(conn, plan_id, adjustment_id, user["id"])
+    except ValueError as e:
+        raise HTTPException(404, str(e))
+    await conn.commit()
+    return result
+
+
+@router.post("/{plan_id}/adjustments/restore")
+async def restore_plan(
+    plan_id: int,
+    user: dict = Depends(get_verified_user),
+    conn: AsyncConnection = Depends(get_db),
+):
+    try:
+        result = await adjustment_svc.restore_plan(conn, plan_id, user["id"])
+    except ValueError as e:
+        raise HTTPException(404, str(e))
+    await conn.commit()
+    return result
+
+
+@router.post("/{plan_id}/adjustments/{adjustment_id}/sync-garmin")
+async def sync_adjustment_garmin(
+    plan_id: int,
+    adjustment_id: int,
+    user: dict = Depends(get_verified_user),
+    conn: AsyncConnection = Depends(get_db),
+):
+    try:
+        result = await adjustment_svc.sync_adjustment_to_garmin(
+            conn, plan_id, adjustment_id, user["id"]
+        )
+    except ValueError as e:
+        raise HTTPException(404, str(e))
+    await conn.commit()
+    return result
+
+
+@router.get("/{plan_id}/adjustments/{adjustment_id}/pace-changes")
+async def get_pace_changes(
+    plan_id: int,
+    adjustment_id: int,
+    user: dict = Depends(get_verified_user),
+    conn: AsyncConnection = Depends(get_db),
+):
+    adj = await plans_q.get_plan_adjustment(conn, adjustment_id)
+    if not adj or adj["plan_id"] != plan_id:
+        raise HTTPException(404, "Adjustment not found")
+    plan = await plans_q.get_plan(conn, plan_id, user["id"])
+    if not plan:
+        raise HTTPException(404, "Plan not found")
+    old_vdot = adj.get("old_vdot") or plan["vdot"]
+    new_vdot = adj.get("new_vdot") or plan["vdot"]
+    return adjustment_svc.get_pace_changes(old_vdot, new_vdot)

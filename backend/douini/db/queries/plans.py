@@ -167,6 +167,19 @@ async def get_plan_session_by_id(
         return dict(zip(cols, row))
 
 
+async def get_review_queue(conn: AsyncConnection, plan_id: int) -> list[dict[str, Any]]:
+    async with conn.cursor() as cur:
+        await cur.execute(
+            "SELECT id, week, day, workout_name, distance_km, garmin_activity_id, "
+            "scheduled_date FROM plan_sessions "
+            "WHERE plan_id = %s AND status = 'review' ORDER BY week, day",
+            (plan_id,),
+        )
+        rows = await cur.fetchall()
+        cols = [desc[0] for desc in cur.description]
+        return [dict(zip(cols, r)) for r in rows]
+
+
 async def get_user_plans(conn: AsyncConnection, user_id: int) -> list[dict[str, Any]]:
     return await list_plans(conn, user_id)
 

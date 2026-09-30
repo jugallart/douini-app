@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import json
+
 from fastapi import APIRouter, Depends, HTTPException
 from psycopg import AsyncConnection
 
 from douini.api.dependencies import get_db, get_verified_user
+from douini.db.queries import plans as plans_q
 from douini.db.queries import sessions as sessions_q
 from douini.services import feedback as feedback_svc
 
@@ -52,6 +55,18 @@ async def patch_session(
     status = data.get("status")
     if status:
         updated = await sessions_q.update_session_status(conn, session_id, status)
+
+        plan_row = await plans_q.get_plan(conn, updated["plan_id"], user["id"])
+        if plan_row:
+            sessions_json = plan_row.get("sessions_json", [])
+            for s in sessions_json:
+                if s["week"] == updated["week"] and s["day"] == updated["day"]:
+                    s["status"] = status
+                    break
+            await plans_q.update_plan_sessions_json(
+                conn, updated["plan_id"], json.dumps(sessions_json)
+            )
+
         await conn.commit()
         return updated
     return session
