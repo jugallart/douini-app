@@ -6,6 +6,7 @@ from psycopg import AsyncConnection
 from douini.api.dependencies import get_db, get_verified_user
 from douini.db.queries import plans as plans_q
 from douini.services import adjustment as adjustment_svc
+from douini.services import celebration as celebration_svc
 from douini.services import plan as plan_svc
 from douini.services import refresh as refresh_svc
 
@@ -166,6 +167,32 @@ async def get_pace_changes(
     old_vdot = adj.get("old_vdot") or plan["vdot"]
     new_vdot = adj.get("new_vdot") or plan["vdot"]
     return adjustment_svc.get_pace_changes(old_vdot, new_vdot)
+
+
+@router.get("/{plan_id}/celebration")
+async def get_celebration(
+    plan_id: int,
+    user: dict = Depends(get_verified_user),
+    conn: AsyncConnection = Depends(get_db),
+):
+    cel = await celebration_svc.get_or_create_celebration(conn, plan_id, user["id"])
+    if cel is None:
+        raise HTTPException(400, "Plan not complete or not found")
+    await conn.commit()
+    return cel
+
+
+@router.post("/{plan_id}/celebration/seen")
+async def mark_celebration_seen_route(
+    plan_id: int,
+    user: dict = Depends(get_verified_user),
+    conn: AsyncConnection = Depends(get_db),
+):
+    ok = await celebration_svc.mark_celebration_seen(conn, plan_id)
+    if not ok:
+        raise HTTPException(404, "Celebration not found")
+    await conn.commit()
+    return {"status": "seen"}
 
 
 @router.post("/{plan_id}/regenerate")
