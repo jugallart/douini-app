@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal } from "react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { plansApi, sessionsApi, authApi, type PlanSession, type SessionFeedbackPayload } from "@douini/shared";
+import { plansApi, sessionsApi, authApi, type PlanSession, type SessionFeedbackPayload, type Celebration } from "@douini/shared";
 import { tokenStore } from "../../lib/tokenStore";
 import { SessionCard } from "../../components/SessionCard";
 
@@ -15,6 +15,21 @@ export default function Dashboard() {
     enabled: !!activePlan,
   });
   const [modalSession, setModalSession] = useState<PlanSession | null>(null);
+
+  const { data: celebration } = useQuery<Celebration>({
+    queryKey: ["plan", activePlan?.id, "celebration"],
+    queryFn: () => plansApi.getCelebration(activePlan!.id),
+    enabled: !!activePlan,
+    retry: false,
+  });
+
+  const markCelebrationSeen = useMutation({
+    mutationFn: () => plansApi.markCelebrationSeen(activePlan!.id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["plan", activePlan?.id, "celebration"] }),
+  });
+
+  const [celebrationClosed, setCelebrationClosed] = useState(false);
+  const showCelebration = celebration && !celebration.seen_at && !celebrationClosed;
 
   const patchMutation = useMutation({
     mutationFn: ({ id, status }: { id: number; status: string }) => sessionsApi.patch(id, { status }),
@@ -55,14 +70,33 @@ export default function Dashboard() {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>{modalSession?.workout || modalSession?.type}</Text>
             <TouchableOpacity style={styles.doneBtn} onPress={() => {
-              const id = Number(modalSession?.id);
-              if (id) patchMutation.mutate({ id, status: "completed" });
+              if (modalSession?.id != null) patchMutation.mutate({ id: modalSession.id, status: "completed" });
               setModalSession(null);
             }}>
               <Text style={styles.doneBtnText}>Marquer comme fait</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setModalSession(null)}>
               <Text style={styles.cancelText}>Annuler</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={!!showCelebration} transparent animationType="fade">
+        <View style={styles.celebrationOverlay}>
+          <View style={styles.celebrationContent}>
+            <Text style={styles.celebrationEmoji}>🎉</Text>
+            <Text style={styles.celebrationTitle}>Plan terminé !</Text>
+            <View style={styles.celebrationStats}>
+              <Text style={styles.celebrationStat}>{celebration?.stats.total_km} km total</Text>
+              <Text style={styles.celebrationStat}>{celebration?.stats.sessions_completed} séances</Text>
+              <Text style={styles.celebrationStat}>Plus longue: {celebration?.stats.longest_run_km} km</Text>
+              {celebration?.stats.vdot_delta != null && (
+                <Text style={styles.celebrationStat}>VDOT: {celebration.stats.vdot_delta >= 0 ? `+${celebration.stats.vdot_delta}` : celebration.stats.vdot_delta}</Text>
+              )}
+            </View>
+            <TouchableOpacity style={styles.doneBtn} onPress={() => { markCelebrationSeen.mutate(); setCelebrationClosed(true); }}>
+              <Text style={styles.doneBtnText}>Fermer</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -83,4 +117,10 @@ const styles = StyleSheet.create({
   doneBtn: { backgroundColor: "#2563eb", borderRadius: 8, padding: 14, alignItems: "center", marginBottom: 12 },
   doneBtnText: { color: "#fff", fontSize: 16, fontWeight: "600" },
   cancelText: { color: "#6b7280", textAlign: "center", fontSize: 14 },
+  celebrationOverlay: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.4)" },
+  celebrationContent: { backgroundColor: "#fff", borderRadius: 16, padding: 28, alignItems: "center", marginHorizontal: 32 },
+  celebrationEmoji: { fontSize: 48, marginBottom: 8 },
+  celebrationTitle: { fontSize: 22, fontWeight: "bold", color: "#2563eb", marginBottom: 16 },
+  celebrationStats: { marginBottom: 20, alignItems: "center" },
+  celebrationStat: { fontSize: 15, color: "#374151", marginVertical: 2 },
 });

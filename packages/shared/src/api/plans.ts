@@ -1,5 +1,6 @@
 import { apiFetch } from "./client";
-import type { PlanSummary, PlanDetail, PlanGeneratePayload, RefreshProposal } from "../types/plan";
+import type { PlanSummary, PlanDetail, PlanGeneratePayload, RefreshProposal, RegenerateResult } from "../types/plan";
+import type { Celebration } from "../types/celebration";
 
 export const plansApi = {
   generate: (payload: PlanGeneratePayload) =>
@@ -20,4 +21,13 @@ export const plansApi = {
 
   declineRefresh: (id: number) =>
     apiFetch<{ status: string }>(`/plans/${id}/refresh-proposal/decline`, { method: "POST" }),
+
+  getCelebration: (id: number) =>
+    apiFetch<Celebration>(`/plans/${id}/celebration`),
+
+  markCelebrationSeen: (id: number) =>
+    apiFetch<{ status: string }>(`/plans/${id}/celebration/seen`, { method: "POST" }),
+
+  regenerate: (id: number, fromWeek?: number) =>
+    apiFetch<RegenerateResult>(`/plans/${id}/regenerate`, { method: "POST", body: JSON.stringify({ from_week: fromWeek }) }),
 };

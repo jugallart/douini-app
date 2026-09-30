@@ -22,3 +22,10 @@ export interface SessionFeedbackPayload {
   pain_evolution?: string;
   temp_cause?: string;
 }
+
+export interface FeedbackResult {
+  feedback_id: number;
+  action: string;
+  reason: string;
+  adjustment: Record<string, unknown> | null;
+}

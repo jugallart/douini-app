@@ -4,6 +4,10 @@ export * from "./types/plan";
 export * from "./types/session";
 export * from "./types/garmin";
 export * from "./types/race";
+export * from "./types/preferences";
+export * from "./types/releases";
+export * from "./types/celebration";
+export * from "./types/notifications";
 export * from "./types";
 
 export { apiFetch, configureClient, getApiBaseUrl, setApiBaseUrl } from "./api/client";
@@ -14,4 +18,7 @@ export { profileApi } from "./api/profile";
 export { sessionsApi } from "./api/sessions";
 export { garminApi } from "./api/garmin";
 export { raceResultsApi } from "./api/race_results";
+export { preferencesApi } from "./api/preferences";
+export { releasesApi } from "./api/releases";
+export { notificationsApi } from "./api/notifications";
 export { statsApi } from "./api";

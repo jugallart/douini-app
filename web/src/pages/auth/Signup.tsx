@@ -25,7 +25,7 @@ export function Signup() {
     try {
       const tokens = await authApi.signup({ email, password });
       tokenStore.setTokens(tokens.access_token, tokens.refresh_token);
-      navigate("/verify-email");
+      navigate("/wizard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur d'inscription");
     } finally {

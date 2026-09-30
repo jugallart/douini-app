@@ -6,6 +6,7 @@ export interface GarminPushResult {
   ok: number;
   fail: number;
   scheduled: number;
+  skipped?: number;
   results: Array<{
     week: number;
     day: string;

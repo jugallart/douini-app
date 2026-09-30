@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 
 from douini.api.dependencies import get_db
 from douini.api.routes import auth as auth_routes
+from douini.api.routes import account as account_routes
 from douini.api.routes import garmin as garmin_routes
 from douini.api.routes import notifications as notifications_routes
 from douini.api.routes import plans as plans_routes
@@ -82,6 +83,7 @@ async def health() -> dict[str, str]:
 
 
 app.include_router(auth_routes.router, prefix=settings.API_PREFIX)
+app.include_router(account_routes.router, prefix=settings.API_PREFIX)
 app.include_router(profile_routes.router, prefix=settings.API_PREFIX)
 app.include_router(plans_routes.router, prefix=settings.API_PREFIX)
 app.include_router(sessions_routes.router, prefix=settings.API_PREFIX)

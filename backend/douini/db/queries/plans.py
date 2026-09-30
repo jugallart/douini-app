@@ -324,3 +324,74 @@ async def clear_plan_garmin_workouts(
                 "WHERE plan_id = %s",
                 (plan_id,),
             )
+
+
+async def delete_week(conn: AsyncConnection, plan_id: int, week: int) -> int:
+    async with conn.cursor() as cur:
+        await cur.execute(
+            "DELETE FROM plan_sessions WHERE plan_id = %s AND week = %s",
+            (plan_id, week),
+        )
+        return cur.rowcount
+
+
+async def set_active_plan(conn: AsyncConnection, plan_id: int, user_id: int) -> None:
+    async with conn.cursor() as cur:
+        await cur.execute(
+            "UPDATE plans SET status = 'committed' WHERE status = 'active' AND user_id = %s",
+            (user_id,),
+        )
+        await cur.execute(
+            "UPDATE plans SET status = 'active' WHERE id = %s", (plan_id,)
+        )
+
+
+async def get_active_plan(conn: AsyncConnection, user_id: int) -> dict[str, Any] | None:
+    async with conn.cursor() as cur:
+        await cur.execute(
+            "SELECT * FROM plans WHERE user_id = %s "
+            "ORDER BY status = 'active' DESC, "
+            "start_date IS NOT NULL AND CURRENT_DATE BETWEEN start_date "
+            "AND (start_date + (weeks || ' weeks')::interval) DESC, "
+            "created_at DESC LIMIT 1",
+            (user_id,),
+        )
+        row = await cur.fetchone()
+        if not row:
+            return None
+        cols = [desc[0] for desc in cur.description]
+        d = dict(zip(cols, row))
+        sj = d.get("sessions_json", [])
+        d["sessions_json"] = json.loads(sj) if isinstance(sj, str) else (sj or [])
+        st = d.get("settings_json", {})
+        d["settings_json"] = json.loads(st) if isinstance(st, str) else (st or {})
+        return d
+
+
+async def plan_progress(conn: AsyncConnection, plan_id: int) -> dict[str, Any]:
+    async with conn.cursor() as cur:
+        await cur.execute(
+            "SELECT "
+            "SUM(CASE WHEN status NOT IN ('removed','skipped') AND type != 'rest' THEN 1 ELSE 0 END) AS active, "
+            "SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completed, "
+            "SUM(CASE WHEN status = 'review' THEN 1 ELSE 0 END) AS review, "
+            "SUM(CASE WHEN status = 'skipped' THEN 1 ELSE 0 END) AS skipped, "
+            "SUM(CASE WHEN status = 'pending' AND type != 'rest' THEN 1 ELSE 0 END) AS pending "
+            "FROM plan_sessions WHERE plan_id = %s AND status != 'removed'",
+            (plan_id,),
+        )
+        row = await cur.fetchone()
+        total = row[0] or 0
+        completed = row[1] or 0
+        if total and completed == total:
+            await cur.execute(
+                "UPDATE plans SET status = 'completed' WHERE id = %s", (plan_id,)
+            )
+        return {
+            "total": total,
+            "completed": completed,
+            "review": row[2] or 0,
+            "skipped": row[3] or 0,
+            "pending": row[4] or 0,
+            "percent": round(completed * 100 / total) if total else 0,
+        }

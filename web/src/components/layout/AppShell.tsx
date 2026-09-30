@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "react-router";
 import { useAuth } from "../../hooks/useAuth";
+import { NotificationBell } from "../notifications/NotificationBell";
+import { ReleaseBanner } from "../releases/ReleaseBanner";
 
 const NAV = [
   { to: "/", label: "Dashboard" },
@@ -33,12 +35,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="flex items-center gap-3">
+            <NotificationBell />
             {user && <span className="text-sm text-gray-500">{user.email}</span>}
             <button onClick={logout} className="text-sm text-gray-500 hover:text-red-600">Déconnexion</button>
           </div>
         </div>
       </header>
       <main className="mx-auto max-w-5xl px-4 py-6">{children}</main>
+      <ReleaseBanner />
     </div>
   );
 }

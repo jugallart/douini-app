@@ -14,6 +14,11 @@ STRIDE_FAST = 20
 STRIDE_SLOW = 40
 
 
+def _seconds_to_distance_m(seconds: int, paces: Paces) -> float:
+    ef_mid = (paces.ef[0].s_per_km + paces.ef[1].s_per_km) / 2
+    return seconds / ef_mid * 1000
+
+
 def _step_executable(order, seconds, step_type_id, step_type_key, target_type="open", value_one=None, value_two=None):
     target_info = (
         {"workoutTargetTypeId": 1, "workoutTargetTypeKey": "no.target"}
@@ -70,10 +75,13 @@ def _pace_to_garmin(p: Pace) -> float:
     return 1000 / p.s_per_km
 
 
-def _make_warmup_steps(paces: Paces):
+def _make_warmup_steps(paces: Paces, interval_unit: str = "time"):
     steps = []
     order = 1
-    steps.append(_step_executable(order, WARMUP_SEC, 1, "warmup", "open"))
+    if interval_unit == "distance":
+        steps.append(_step_distance(order, _seconds_to_distance_m(WARMUP_SEC, paces), 1, "warmup"))
+    else:
+        steps.append(_step_executable(order, WARMUP_SEC, 1, "warmup", "open"))
     order += 1
     stride_fast = _step_executable(1, STRIDE_FAST, 3, "interval", "open")
     stride_slow = _step_executable(2, STRIDE_SLOW, 4, "recovery", "open")
@@ -82,32 +90,41 @@ def _make_warmup_steps(paces: Paces):
     return steps, order
 
 
-def _make_interval_step(order, seconds, pace_min: Pace, pace_max: Pace):
+def _make_interval_step(order, seconds, pace_min: Pace, pace_max: Pace, interval_unit: str = "time"):
     fast = _pace_to_garmin(pace_min)
     slow = _pace_to_garmin(pace_max)
-    return _step_executable(order, seconds, 3, "interval", "pace", fast, slow)
+    step = _step_executable(order, seconds, 3, "interval", "pace", fast, slow)
+    if interval_unit == "distance":
+        midpoint = (pace_min.s_per_km + pace_max.s_per_km) / 2
+        step["endCondition"] = {"conditionTypeId": 3, "conditionTypeKey": "distance"}
+        step["endConditionValue"] = float(seconds / midpoint * 1000)
+    return step
 
 
-def _make_recovery_step(order, seconds, paces: Paces):
+def _make_recovery_step(order, seconds, paces: Paces, interval_unit: str = "time"):
+    # Recovery between intervals stays time-based — walkers/joggers need duration, not distance.
     return _step_executable(order, seconds, 4, "recovery", "open")
 
 
-def _add_cooldown(steps, order, paces: Paces):
-    steps.append(_step_executable(order, COOLDOWN_SEC, 2, "cooldown", "open"))
+def _add_cooldown(steps, order, paces: Paces, interval_unit: str = "time"):
+    if interval_unit == "distance":
+        steps.append(_step_distance(order, _seconds_to_distance_m(COOLDOWN_SEC, paces), 2, "cooldown"))
+    else:
+        steps.append(_step_executable(order, COOLDOWN_SEC, 2, "cooldown", "open"))
 
 
-def _build_uniform(wd, paces, display_name=None, profile=None):
-    steps, order = _make_warmup_steps(paces)
-    rep_step = _make_interval_step(1, wd.interval_sec, wd.pace_min, wd.pace_max)
+def _build_uniform(wd, paces, display_name=None, profile=None, interval_unit="time"):
+    steps, order = _make_warmup_steps(paces, interval_unit=interval_unit)
+    rep_step = _make_interval_step(1, wd.interval_sec, wd.pace_min, wd.pace_max, interval_unit=interval_unit)
     rec_step = _make_recovery_step(2, wd.rec_sec, paces)
     steps.append(_step_repeat(order, wd.reps, [rep_step, rec_step]))
     order += 1
-    _add_cooldown(steps, order, paces)
+    _add_cooldown(steps, order, paces, interval_unit=interval_unit)
     return _build_workout_json(display_name or wd.name, wd.description, steps)
 
 
-def _build_variable(wd, paces, display_name=None, profile=None):
-    steps, order = _make_warmup_steps(paces)
+def _build_variable(wd, paces, display_name=None, profile=None, interval_unit="time"):
+    steps, order = _make_warmup_steps(paces, interval_unit=interval_unit)
     entry = _get_catalog_workout(wd.name) or {}
     raw_blocks = entry.get("blocks", [])
     if raw_blocks and isinstance(raw_blocks[0], dict):
@@ -118,16 +135,16 @@ def _build_variable(wd, paces, display_name=None, profile=None):
         pace_range = _resolve_pace_range(pace_key, paces, profile=profile)
         if pace_range is None:
             pace_range = (paces.ef[0], paces.ef[1])
-        steps.append(_make_interval_step(order, sec, pace_range[0], pace_range[1]))
+        steps.append(_make_interval_step(order, sec, pace_range[0], pace_range[1], interval_unit=interval_unit))
         order += 1
         steps.append(_make_recovery_step(order, wd.rec_sec, paces))
         order += 1
-    _add_cooldown(steps, order, paces)
+    _add_cooldown(steps, order, paces, interval_unit=interval_unit)
     return _build_workout_json(display_name or wd.name, wd.description, steps)
 
 
-def _build_progressive(wd, paces, display_name=None, profile=None):
-    steps, order = _make_warmup_steps(paces)
+def _build_progressive(wd, paces, display_name=None, profile=None, interval_unit="time"):
+    steps, order = _make_warmup_steps(paces, interval_unit=interval_unit)
     pace_range = _resolve_pace_range(wd.zone.value, paces, profile=profile)
     if pace_range is None:
         pace_range = (paces.ef[0], paces.ef[1])
@@ -136,15 +153,15 @@ def _build_progressive(wd, paces, display_name=None, profile=None):
         t = i / max(n - 1, 1)
         p_min = pace_range[0].scaled(1 - t * 0.02)
         p_max = pace_range[1].scaled(1 - t * 0.02)
-        steps.append(_make_interval_step(order, wd.interval_sec, p_min, p_max))
+        steps.append(_make_interval_step(order, wd.interval_sec, p_min, p_max, interval_unit=interval_unit))
         order += 1
         steps.append(_make_recovery_step(order, wd.rec_sec, paces))
         order += 1
-    _add_cooldown(steps, order, paces)
+    _add_cooldown(steps, order, paces, interval_unit=interval_unit)
     return _build_workout_json(display_name or wd.name, wd.description, steps)
 
 
-def _build_distance(wd, paces, display_name=None, profile=None):
+def _build_distance(wd, paces, display_name=None, profile=None, interval_unit="time"):
     entry = _get_catalog_workout(wd.name) or {}
     distance_m = entry.get("interval_m", 0) or entry.get("distance_m", 0)
     pace_key = entry.get("pace_key", "threshold")
@@ -156,7 +173,10 @@ def _build_distance(wd, paces, display_name=None, profile=None):
     steps = []
     order = 1
     if warmup_sec > 0:
-        steps.append(_step_executable(order, warmup_sec, 1, "warmup", "open"))
+        if interval_unit == "distance":
+            steps.append(_step_distance(order, _seconds_to_distance_m(warmup_sec, paces), 1, "warmup"))
+        else:
+            steps.append(_step_executable(order, warmup_sec, 1, "warmup", "open"))
         order += 1
 
     pace_range = _resolve_pace_range(pace_key, paces, profile=profile)
@@ -184,13 +204,16 @@ def _build_distance(wd, paces, display_name=None, profile=None):
         order += 1
 
     if cooldown_sec > 0:
-        steps.append(_step_executable(order, cooldown_sec, 2, "cooldown", "open"))
+        if interval_unit == "distance":
+            steps.append(_step_distance(order, _seconds_to_distance_m(cooldown_sec, paces), 2, "cooldown"))
+        else:
+            steps.append(_step_executable(order, cooldown_sec, 2, "cooldown", "open"))
         order += 1
 
     return _build_workout_json(display_name or wd.name, wd.description, steps)
 
 
-def _build_time(wd, paces, display_name=None, profile=None):
+def _build_time(wd, paces, display_name=None, profile=None, interval_unit="time"):
     entry = _get_catalog_workout(wd.name) or {}
     duration = entry.get("duration_sec", 2700)
     step = _step_executable(1, duration, 3, "interval", "open")
@@ -220,7 +243,7 @@ _BUILDERS = {
 }
 
 
-def build_garmin_workout(name, paces, display_name=None, profile=None):
+def build_garmin_workout(name, paces, display_name=None, profile=None, interval_unit="time"):
     entry = _get_catalog_workout(name)
     if entry:
         structure = entry.get("structure", "uniform")
@@ -228,7 +251,7 @@ def build_garmin_workout(name, paces, display_name=None, profile=None):
         structure = WORKOUT_DEFS.get(name, {}).get("structure", "uniform")
     wd = build_workout(name, paces, profile=profile)
     builder = _BUILDERS.get(structure, _build_uniform)
-    return builder(wd, paces, display_name=display_name, profile=profile)
+    return builder(wd, paces, display_name=display_name, profile=profile, interval_unit=interval_unit)
 
 
 def _build_continuous_workout(display_name, description, distance_km):
@@ -247,7 +270,7 @@ def build_long_workout(display_name, duration_sec=5400, distance_km=None):
     return _build_continuous_workout(display_name, "Sortie Longue EF", distance_km)
 
 
-def build_session_workout(session, paces, display_name, profile=None):
+def build_session_workout(session, paces, display_name, profile=None, interval_unit="time"):
     if session.workout:
         entry = _get_catalog_workout(session.workout.name)
         if not entry:
@@ -260,7 +283,8 @@ def build_session_workout(session, paces, display_name, profile=None):
                 distance_km=session.distance_km,
             )
         workout = build_garmin_workout(
-            session.workout.name, paces, display_name=display_name, profile=profile
+            session.workout.name, paces, display_name=display_name, profile=profile,
+            interval_unit=interval_unit,
         )
         distance_m = round(session.distance_km * 1000)
         workout["estimatedDistanceInMeters"] = distance_m

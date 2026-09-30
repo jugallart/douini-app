@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from fastapi import APIRouter, Depends, HTTPException
 from psycopg import AsyncConnection
 
@@ -47,9 +49,16 @@ async def get_plan(
 @router.delete("/{plan_id}")
 async def delete_plan(
     plan_id: int,
+    garmin_cleanup: bool = False,
     user: dict = Depends(get_verified_user),
     conn: AsyncConnection = Depends(get_db),
 ):
+    if garmin_cleanup:
+        try:
+            from douini.garmin.sync import delete_plan_from_garmin
+            await delete_plan_from_garmin(conn, plan_id, user["id"])
+        except (ValueError, Exception):
+            pass
     deleted = await plans_q.delete_plan(conn, plan_id, user["id"])
     if not deleted:
         raise HTTPException(404, "Plan not found")
@@ -209,3 +218,85 @@ async def regenerate_plan(
         raise HTTPException(400, str(e))
     await conn.commit()
     return result
+
+
+@router.put("/{plan_id}/weeks/{week}")
+async def edit_week(
+    plan_id: int,
+    week: int,
+    data: dict,
+    user: dict = Depends(get_verified_user),
+    conn: AsyncConnection = Depends(get_db),
+):
+    plan = await plans_q.get_plan(conn, plan_id, user["id"])
+    if not plan:
+        raise HTTPException(404, "Plan not found")
+
+    locked = await plans_q.locked_plan_session_keys(conn, plan_id)
+    new_days = {s["day"] for s in data.get("sessions", [])}
+    locked_in_week = {d for w, d in locked if w == week}
+    if locked_in_week & new_days:
+        raise HTTPException(409, f"Cannot edit locked sessions: {locked_in_week & new_days}")
+
+    sessions_json = plan.get("sessions_json", [])
+    sessions_json = [s for s in sessions_json if s["week"] != week]
+    for s in data.get("sessions", []):
+        s["week"] = week
+        sessions_json.append(s)
+    sessions_json.sort(key=lambda s: (s["week"], s.get("day", "")))
+
+    await plans_q.update_plan_sessions_json(conn, plan_id, json.dumps(sessions_json))
+    from douini.domain.models import DAY_OFFSET
+    from datetime import timedelta
+    start_date = plan.get("start_date")
+    async with conn.cursor() as cur:
+        await cur.execute(
+            "DELETE FROM plan_sessions WHERE plan_id = %s AND week = %s",
+            (plan_id, week),
+        )
+        for s in data.get("sessions", []):
+            if start_date:
+                sd = start_date + timedelta(weeks=week - 1, days=DAY_OFFSET.get(s["day"], 0))
+            else:
+                sd = None
+            await cur.execute(
+                "INSERT INTO plan_sessions (plan_id, week, day, scheduled_date, type, "
+                "workout_name, distance_km, status) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) "
+                "ON CONFLICT (plan_id, week, day) DO UPDATE SET "
+                "type = EXCLUDED.type, workout_name = EXCLUDED.workout_name, "
+                "distance_km = EXCLUDED.distance_km, updated_at = NOW()",
+                (plan_id, week, s["day"], sd, s.get("type", "easy"),
+                 s.get("workout", ""), s.get("distance_km", 0),
+                 s.get("status", "pending")),
+            )
+    await conn.commit()
+    return {"status": "updated", "week": week}
+
+
+@router.delete("/{plan_id}/weeks/{week}")
+async def delete_week(
+    plan_id: int,
+    week: int,
+    user: dict = Depends(get_verified_user),
+    conn: AsyncConnection = Depends(get_db),
+):
+    plan = await plans_q.get_plan(conn, plan_id, user["id"])
+    if not plan:
+        raise HTTPException(404, "Plan not found")
+
+    locked = await plans_q.locked_plan_session_keys(conn, plan_id)
+    locked_in_week = {d for w, d in locked if w == week}
+    if locked_in_week:
+        raise HTTPException(409, f"Cannot delete week with locked sessions: {locked_in_week}")
+
+    deleted = await plans_q.delete_week(conn, plan_id, week)
+    if not deleted:
+        raise HTTPException(404, "Week not found")
+
+    sessions_json = plan.get("sessions_json", [])
+    sessions_json = [s for s in sessions_json if s["week"] != week]
+    await plans_q.update_plan_sessions_json(conn, plan_id, json.dumps(sessions_json))
+
+    await conn.commit()
+    return {"status": "deleted", "week": week}

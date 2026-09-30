@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { profileApi, plansApi } from "@douini/shared";
 import { AppShell } from "../components/layout/AppShell";
 import { Button } from "../components/ui/Button";
@@ -25,6 +25,7 @@ export function Wizard() {
   const [currentLongestRun, setCurrentLongestRun] = useState(10);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const qc = useQueryClient();
 
   const generateMutation = useMutation({
     mutationFn: async () => {
@@ -49,7 +50,10 @@ export function Wizard() {
         experience,
       });
     },
-    onSuccess: () => navigate("/"),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["plans"] });
+      navigate("/");
+    },
     onError: (err) => setError(err instanceof Error ? err.message : "Erreur"),
   });
 

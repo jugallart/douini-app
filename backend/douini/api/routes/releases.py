@@ -31,3 +31,13 @@ async def mark_read(
     await rn.mark_release_read(conn, user["id"], version)
     await conn.commit()
     return {"ok": True}
+
+
+@router.post("/read-all")
+async def mark_all_read(
+    user: dict = Depends(get_verified_user),
+    conn: AsyncConnection = Depends(get_db),
+):
+    count = await rn.mark_all_releases_read(conn, user["id"])
+    await conn.commit()
+    return {"ok": True, "marked": count}

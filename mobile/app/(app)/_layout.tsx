@@ -13,6 +13,10 @@ export default function AppLayout() {
         options={{ title: "Plan", tabBarIcon: ({ color }) => <Ionicons name="calendar" size={24} color={color} /> }}
       />
       <Tabs.Screen
+        name="notifications"
+        options={{ title: "Notif.", tabBarIcon: ({ color }) => <Ionicons name="notifications" size={24} color={color} /> }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{ title: "Profil", tabBarIcon: ({ color }) => <Ionicons name="person" size={24} color={color} /> }}
       />

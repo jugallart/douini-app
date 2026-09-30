@@ -33,6 +33,14 @@ export function useGarminSync() {
   });
 }
 
+export function useGarminDeleteWorkouts() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (planId: number) => garminApi.deleteWorkouts(planId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["garmin"] }),
+  });
+}
+
 export function useGarminDisconnect() {
   const qc = useQueryClient();
   return useMutation({

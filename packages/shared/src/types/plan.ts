@@ -31,7 +31,7 @@ export interface PlanSession {
   duration: string;
   pace_label: string;
   status: string;
-  id: string | null;
+  id: number | null;
 }
 
 export interface PlanGeneratePayload {
@@ -65,4 +65,9 @@ export interface RefreshProposal {
   evidence: Record<string, unknown>;
   confidence: string;
   assumptions: string[];
+}
+
+export interface RegenerateResult {
+  plan_id: number;
+  from_week: number;
 }

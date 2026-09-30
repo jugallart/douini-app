@@ -18,7 +18,7 @@ async def create_user(conn: AsyncConnection, email: str, password_hash: str) -> 
 async def get_user_by_email(conn: AsyncConnection, email: str) -> dict[str, Any] | None:
     async with conn.cursor() as cur:
         await cur.execute(
-            "SELECT id, email, password_hash, email_verified, created_at, updated_at "
+            "SELECT id, email, password_hash, email_verified, pseudo, prenom, nom, created_at, updated_at "
             "FROM users WHERE email = %s",
             (email,),
         )
@@ -30,15 +30,18 @@ async def get_user_by_email(conn: AsyncConnection, email: str) -> dict[str, Any]
             "email": row[1],
             "password_hash": row[2],
             "email_verified": row[3],
-            "created_at": row[4],
-            "updated_at": row[5],
+            "pseudo": row[4],
+            "prenom": row[5],
+            "nom": row[6],
+            "created_at": row[7],
+            "updated_at": row[8],
         }
 
 
 async def get_user_by_id(conn: AsyncConnection, user_id: int) -> dict[str, Any] | None:
     async with conn.cursor() as cur:
         await cur.execute(
-            "SELECT id, email, password_hash, email_verified, created_at, updated_at "
+            "SELECT id, email, password_hash, email_verified, pseudo, prenom, nom, created_at, updated_at "
             "FROM users WHERE id = %s",
             (user_id,),
         )
@@ -50,8 +53,11 @@ async def get_user_by_id(conn: AsyncConnection, user_id: int) -> dict[str, Any] 
             "email": row[1],
             "password_hash": row[2],
             "email_verified": row[3],
-            "created_at": row[4],
-            "updated_at": row[5],
+            "pseudo": row[4],
+            "prenom": row[5],
+            "nom": row[6],
+            "created_at": row[7],
+            "updated_at": row[8],
         }
 
 
@@ -191,4 +197,97 @@ async def update_password(conn: AsyncConnection, user_id: int, password_hash: st
         await cur.execute(
             "UPDATE users SET password_hash = %s, updated_at = NOW() WHERE id = %s",
             (password_hash, user_id),
+        )
+
+
+async def delete_user(conn: AsyncConnection, user_id: int) -> None:
+    async with conn.cursor() as cur:
+        await cur.execute(
+            "SELECT id FROM plans WHERE user_id = %s", (user_id,)
+        )
+        plan_ids = [r[0] for r in await cur.fetchall()]
+        if plan_ids:
+            await cur.execute(
+                "DELETE FROM session_feedback WHERE plan_session_id IN "
+                "(SELECT id FROM plan_sessions WHERE plan_id = ANY(%s))",
+                (plan_ids,),
+            )
+            await cur.execute(
+                "DELETE FROM plan_adjustments WHERE plan_id = ANY(%s)", (plan_ids,)
+            )
+            await cur.execute(
+                "DELETE FROM plan_refresh_state WHERE plan_id = ANY(%s)", (plan_ids,)
+            )
+            await cur.execute(
+                "DELETE FROM plan_sessions WHERE plan_id = ANY(%s)", (plan_ids,)
+            )
+        await cur.execute("DELETE FROM race_results WHERE user_id = %s", (user_id,))
+        await cur.execute("DELETE FROM profile_vdot_history WHERE user_id = %s", (user_id,))
+        await cur.execute("DELETE FROM plans WHERE user_id = %s", (user_id,))
+        await cur.execute("DELETE FROM profile WHERE user_id = %s", (user_id,))
+        await cur.execute("DELETE FROM email_verifications WHERE user_id = %s", (user_id,))
+        await cur.execute("DELETE FROM release_reads WHERE user_id = %s", (user_id,))
+        await cur.execute("DELETE FROM plan_celebrations WHERE user_id = %s", (user_id,))
+        await cur.execute("DELETE FROM sync_notifications WHERE user_id = %s", (user_id,))
+        await cur.execute("DELETE FROM garmin_tokens WHERE user_id = %s", (user_id,))
+        await cur.execute("DELETE FROM refresh_tokens WHERE user_id = %s", (user_id,))
+        await cur.execute("DELETE FROM user_preferences WHERE user_id = %s", (user_id,))
+        await cur.execute("DELETE FROM auth_attempts WHERE key = %s", (str(user_id),))
+        await cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+
+
+async def reset_all_data(conn: AsyncConnection, user_id: int) -> None:
+    async with conn.cursor() as cur:
+        await cur.execute("DELETE FROM race_results WHERE user_id = %s", (user_id,))
+        await cur.execute("DELETE FROM plan_celebrations WHERE user_id = %s", (user_id,))
+        await cur.execute(
+            "SELECT id FROM plans WHERE user_id = %s", (user_id,)
+        )
+        plan_ids = [r[0] for r in await cur.fetchall()]
+        if plan_ids:
+            await cur.execute(
+                "DELETE FROM session_feedback WHERE plan_session_id IN "
+                "(SELECT id FROM plan_sessions WHERE plan_id = ANY(%s))",
+                (plan_ids,),
+            )
+            await cur.execute(
+                "DELETE FROM plan_adjustments WHERE plan_id = ANY(%s)", (plan_ids,)
+            )
+            await cur.execute(
+                "DELETE FROM plan_refresh_state WHERE plan_id = ANY(%s)", (plan_ids,)
+            )
+            await cur.execute(
+                "DELETE FROM plan_sessions WHERE plan_id = ANY(%s)", (plan_ids,)
+            )
+        await cur.execute("DELETE FROM plans WHERE user_id = %s", (user_id,))
+        await cur.execute("DELETE FROM profile_vdot_history WHERE user_id = %s", (user_id,))
+        await cur.execute("DELETE FROM profile WHERE user_id = %s", (user_id,))
+        await cur.execute("DELETE FROM sync_notifications WHERE user_id = %s", (user_id,))
+
+
+async def record_auth_attempt(conn: AsyncConnection, key: str) -> None:
+    async with conn.cursor() as cur:
+        await cur.execute(
+            "INSERT INTO auth_attempts (key) VALUES (%s)", (key,)
+        )
+        await cur.execute("DELETE FROM auth_attempts WHERE attempted_at < NOW() - INTERVAL '1 hour'")
+
+
+async def count_auth_attempts(conn: AsyncConnection, key: str, window_seconds: int) -> int:
+    async with conn.cursor() as cur:
+        await cur.execute(
+            "SELECT COUNT(*) FROM auth_attempts WHERE key = %s AND attempted_at >= NOW() - (%s || ' seconds')::INTERVAL",
+            (key, str(window_seconds)),
+        )
+        row = await cur.fetchone()
+        return row[0] if row else 0
+
+
+async def update_user_identity(
+    conn: AsyncConnection, user_id: int, pseudo: str | None, prenom: str | None, nom: str | None
+) -> None:
+    async with conn.cursor() as cur:
+        await cur.execute(
+            "UPDATE users SET pseudo = %s, prenom = %s, nom = %s, updated_at = NOW() WHERE id = %s",
+            (pseudo, prenom, nom, user_id),
         )

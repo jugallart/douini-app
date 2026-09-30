@@ -4,12 +4,14 @@ import { usePlans, usePlanDetail, usePatchSession, useAddFeedback } from "../hoo
 import { useGarminStatus } from "../hooks/useGarmin";
 import { AppShell } from "../components/layout/AppShell";
 import { Card } from "../components/ui/Card";
+import { Alert } from "../components/ui/Alert";
 import { Spinner } from "../components/ui/Spinner";
 import { ProgressBar } from "../components/dashboard/ProgressBar";
 import { WeekView } from "../components/dashboard/WeekView";
 import { GarminBanner } from "../components/dashboard/GarminBanner";
 import { FeedbackDialog } from "../components/plan/FeedbackDialog";
-import type { PlanSession } from "@douini/shared";
+import { CelebrationModal } from "../components/celebration/CelebrationModal";
+import type { PlanSession, FeedbackResult } from "@douini/shared";
 
 export function Dashboard() {
   const { data: plans } = usePlans();
@@ -19,6 +21,7 @@ export function Dashboard() {
   const patchSession = usePatchSession();
   const addFeedback = useAddFeedback();
   const [feedbackSession, setFeedbackSession] = useState<PlanSession | null>(null);
+  const [feedbackResult, setFeedbackResult] = useState<FeedbackResult | null>(null);
 
   if (isLoading) return <AppShell><Spinner /></AppShell>;
 
@@ -56,15 +59,26 @@ export function Dashboard() {
         </Card>
       </div>
 
+      {activePlan && <CelebrationModal planId={activePlan.id} />}
+
+      {feedbackResult && (
+        <div className="fixed bottom-4 right-4 z-50 max-w-sm">
+          <Alert type={feedbackResult.action === "maintain" ? "success" : feedbackResult.action.startsWith("suspend") ? "error" : "info"}>
+            <p className="font-medium">{feedbackResult.action.replace(/_/g, " ")}</p>
+            <p className="mt-1 text-xs opacity-80">{feedbackResult.reason}</p>
+          </Alert>
+        </div>
+      )}
+
       {feedbackSession && (
         <FeedbackDialog
           session={feedbackSession}
           onClose={() => setFeedbackSession(null)}
           onSubmit={async (fb) => {
-            const sessionDbId = Number(feedbackSession.id);
-            if (sessionDbId) {
-              await patchSession.mutateAsync({ id: sessionDbId, status: "completed" });
-              await addFeedback.mutateAsync({ id: sessionDbId, feedback: fb });
+            if (feedbackSession.id != null) {
+              await patchSession.mutateAsync({ id: feedbackSession.id, status: "completed" });
+              const result = await addFeedback.mutateAsync({ id: feedbackSession.id, feedback: fb });
+              setFeedbackResult(result);
             }
             setFeedbackSession(null);
           }}

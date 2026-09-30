@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import json
 from dataclasses import asdict
-from datetime import date
+from datetime import date, timedelta
 from typing import Any
 
 from psycopg import AsyncConnection
 
-from douini.db.queries import profile as profile_q
+from douini.db.queries import garmin as garmin_q
 from douini.db.queries import plans as plans_q
+from douini.db.queries import profile as profile_q
 from douini.domain.engine.pace_engine import PaceEngine
 from douini.domain.models import (
     DifficultyLevel,
@@ -290,6 +291,15 @@ async def get_plan_detail(
     row = await plans_q.get_plan(conn, plan_id, user_id)
     if not row:
         return None
+
+    sessions = row.get("sessions_json", [])
+    db_sessions = await plans_q.get_plan_sessions(conn, plan_id)
+    id_map = {(s["week"], s["day"]): s["id"] for s in db_sessions}
+    for s in sessions:
+        db_id = id_map.get((s.get("week"), s.get("day")))
+        if db_id is not None:
+            s["id"] = db_id
+
     return {
         "id": row["id"],
         "name": row.get("name"),
@@ -299,7 +309,7 @@ async def get_plan_detail(
         "start_date": str(row["start_date"]) if row.get("start_date") else None,
         "goal_time": row.get("goal_time"),
         "status": row.get("status", "active"),
-        "sessions": row.get("sessions_json", []),
+        "sessions": sessions,
         "settings": row.get("settings_json", {}),
         "created_at": str(row.get("created_at")) if row.get("created_at") else None,
     }
@@ -330,3 +340,29 @@ async def regenerate_plan_service(
     )
 
     return {"plan_id": plan_id, "from_week": from_week}
+
+
+def compute_current_week(plan_start: date, weeks: int) -> int:
+    delta = (date.today() - plan_start).days
+    return max(1, min(weeks, delta // 7 + 1))
+
+
+async def apply_interval_unit_change(conn: AsyncConnection, user_id: int, use_distance: bool) -> None:
+    interval_unit = "distance" if use_distance else "time"
+    row = await plans_q.get_active_plan(conn, user_id)
+    if not row:
+        return
+    plan_id = row["id"]
+    garmin_status = await garmin_q.get_garmin_status(conn, user_id)
+    if not garmin_status["connected"]:
+        return
+    plan = await plan_from_row(conn, row)
+    today = date.today()
+    plan_start = plan.start_date
+    if not plan_start or plan_start > today + timedelta(days=6):
+        return
+    current_week = compute_current_week(plan_start, plan.weeks)
+    from douini.garmin.sync import push_plan_sessions_to_garmin
+    await push_plan_sessions_to_garmin(
+        conn, plan_id, user_id, force=True, week=current_week, interval_unit=interval_unit,
+    )

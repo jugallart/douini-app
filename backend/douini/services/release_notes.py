@@ -34,3 +34,18 @@ async def mark_release_read(conn: AsyncConnection, user_id: int, version: str) -
             """,
             (user_id, version),
         )
+
+
+async def mark_all_releases_read(conn: AsyncConnection, user_id: int) -> int:
+    all_releases = get_all_releases()
+    versions = [r["version"] for r in all_releases]
+    if not versions:
+        return 0
+    async with conn.cursor() as cur:
+        for version in versions:
+            await cur.execute(
+                "INSERT INTO release_reads (user_id, release_version) "
+                "VALUES (%s, %s) ON CONFLICT DO NOTHING",
+                (user_id, version),
+            )
+    return len(versions)

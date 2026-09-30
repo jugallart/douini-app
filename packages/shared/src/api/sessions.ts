@@ -1,5 +1,5 @@
 import { apiFetch } from "./client";
-import type { Session, SessionFeedbackPayload } from "../types/session";
+import type { Session, SessionFeedbackPayload, FeedbackResult } from "../types/session";
 
 export const sessionsApi = {
   get: (id: number) => apiFetch<Session>(`/sessions/${id}`),
@@ -8,5 +8,5 @@ export const sessionsApi = {
     apiFetch<Session>(`/sessions/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
 
   addFeedback: (id: number, payload: SessionFeedbackPayload) =>
-    apiFetch<unknown>(`/sessions/${id}/feedback`, { method: "POST", body: JSON.stringify(payload) }),
+    apiFetch<FeedbackResult>(`/sessions/${id}/feedback`, { method: "POST", body: JSON.stringify(payload) }),
 };

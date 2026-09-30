@@ -55,8 +55,9 @@ async def push_plan(
     conn: AsyncConnection = Depends(get_db),
 ):
     force = (data or {}).get("force", False)
+    interval_unit = (data or {}).get("interval_unit", "time")
     try:
-        result = await push_plan_sessions_to_garmin(conn, plan_id, user["id"], force=force)
+        result = await push_plan_sessions_to_garmin(conn, plan_id, user["id"], force=force, interval_unit=interval_unit)
     except ValueError as e:
         raise HTTPException(404, str(e))
     except Exception as e:

@@ -13,6 +13,9 @@ export const garminApi = {
   sync: (planId: number) =>
     apiFetch<GarminSyncResult>(`/garmin/sync/${planId}`, { method: "POST" }),
 
+  deleteWorkouts: (planId: number) =>
+    apiFetch<{ deleted: number; failed: number }>(`/garmin/workouts/${planId}`, { method: "DELETE" }),
+
   disconnect: () =>
     apiFetch<{ status: string }>("/garmin/disconnect", { method: "DELETE" }),
 };

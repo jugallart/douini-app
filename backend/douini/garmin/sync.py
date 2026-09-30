@@ -28,6 +28,7 @@ async def push_plan_sessions_to_garmin(
     *,
     force: bool = False,
     week: int | None = None,
+    interval_unit: str = "time",
 ) -> dict[str, Any]:
     row = await plans_q.get_plan(conn, plan_id, user_id)
     if not row:
@@ -63,7 +64,7 @@ async def push_plan_sessions_to_garmin(
             continue
 
         name = french_session_name(w, d, session, plan_name=plan.name)
-        wj = build_session_workout(session, plan.paces, name, profile=plan.pace_profile)
+        wj = build_session_workout(session, plan.paces, name, profile=plan.pace_profile, interval_unit=interval_unit)
 
         if existing_wid and force:
             success, result = await asyncio.to_thread(update_workout, client, existing_wid, wj)
