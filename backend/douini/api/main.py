@@ -18,6 +18,7 @@ from douini.api.routes import plans as plans_routes
 from douini.api.routes import preferences as preferences_routes
 from douini.api.routes import profile as profile_routes
 from douini.api.routes import race_results as race_results_routes
+from douini.api.routes import releases as releases_routes
 from douini.api.routes import sessions as sessions_routes
 from douini.api.routes import statistics as statistics_routes
 from douini.db.connection import close_pool, open_pool
@@ -89,3 +90,4 @@ app.include_router(statistics_routes.router, prefix=settings.API_PREFIX)
 app.include_router(garmin_routes.router, prefix=settings.API_PREFIX)
 app.include_router(notifications_routes.router, prefix=settings.API_PREFIX)
 app.include_router(preferences_routes.router, prefix=settings.API_PREFIX)
+app.include_router(releases_routes.router, prefix=settings.API_PREFIX)
