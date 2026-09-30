@@ -143,3 +143,14 @@ async def get_global_training_statistics(
         "total_sessions": len(sessions),
         "total_distance": sum(s.get("distance_km", 0) or 0 for s in sessions),
     }
+
+
+async def get_quality_pace_ratings(conn: AsyncConnection, plan_id: int) -> list[str]:
+    async with conn.cursor() as cur:
+        await cur.execute(
+            "SELECT sf.pace_rating FROM session_feedback sf "
+            "JOIN plan_sessions ps ON sf.plan_session_id = ps.id "
+            "WHERE ps.plan_id = %s AND ps.type = 'quality' AND ps.status = 'completed'",
+            (plan_id,),
+        )
+        return [r[0] for r in await cur.fetchall()]

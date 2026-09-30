@@ -8,6 +8,7 @@ from psycopg import AsyncConnection
 from douini.db.queries import plans as plans_q
 from douini.db.queries import profile as profile_q
 from douini.db.queries import race_results as race_q
+from douini.db.queries import sessions as sessions_q
 from douini.domain.engine.config import get_distance_rules
 from douini.domain.models import RefreshProposal
 
@@ -63,8 +64,19 @@ async def get_refresh_proposal(
         proposed_vdot = latest_race["derived_vdot"]
         confidence = "high"
     else:
-        proposed_vdot = old_vdot
-        confidence = "low"
+        ratings = await sessions_q.get_quality_pace_ratings(conn, plan_id)
+        too_hard = sum(1 for r in ratings if r == "too_hard")
+        too_easy = sum(1 for r in ratings if r == "too_easy")
+
+        if too_hard > too_easy and too_hard > 0:
+            proposed_vdot = max(old_vdot - 0.5, old_vdot - 1.0)
+            confidence = "medium"
+        elif too_easy > too_hard and too_easy > 0:
+            proposed_vdot = min(old_vdot + 0.5, old_vdot + 1.0)
+            confidence = "medium"
+        else:
+            proposed_vdot = old_vdot
+            confidence = "low"
 
     proposal = RefreshProposal(
         old_vdot=old_vdot,
