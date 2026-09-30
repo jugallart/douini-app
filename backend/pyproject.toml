@@ -24,6 +24,11 @@ dev = [
     "httpx>=0.27",
 ]
 
+[project.scripts]
+douini-admin = "douini.cli.admin:main"
+douini-cli = "douini.cli.tui:main"
+douini-garmin-import = "douini.cli.garmin_import:main"
+
 [tool.setuptools.packages.find]
 include = ["douini*"]
 
