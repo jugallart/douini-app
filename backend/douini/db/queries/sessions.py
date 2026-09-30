@@ -6,6 +6,36 @@ from typing import Any
 from psycopg import AsyncConnection
 
 
+async def get_session_by_id(
+    conn: AsyncConnection, session_id: int
+) -> dict[str, Any] | None:
+    async with conn.cursor() as cur:
+        await cur.execute(
+            "SELECT * FROM plan_sessions WHERE id = %s", (session_id,)
+        )
+        row = await cur.fetchone()
+        if not row:
+            return None
+        cols = [desc[0] for desc in cur.description]
+        return dict(zip(cols, row))
+
+
+async def get_previous_quality_streak(
+    conn: AsyncConnection, plan_id: int, session_id: int
+) -> int:
+    async with conn.cursor() as cur:
+        await cur.execute(
+            "SELECT sf.difficulty_streak FROM session_feedback sf "
+            "JOIN plan_sessions ps ON sf.plan_session_id = ps.id "
+            "WHERE ps.plan_id = %s AND ps.type = 'quality' "
+            "AND ps.status = 'completed' AND ps.id != %s "
+            "ORDER BY ps.scheduled_date DESC, ps.id DESC LIMIT 1",
+            (plan_id, session_id),
+        )
+        row = await cur.fetchone()
+        return row[0] if row else 0
+
+
 async def update_session_status(
     conn: AsyncConnection, session_id: int, status: str
 ) -> dict[str, Any] | None:
