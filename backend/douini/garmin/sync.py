@@ -175,12 +175,26 @@ async def sync_plan_from_garmin(
 
     matches, reviews, unmatched = reconcile_plan_sessions(session_dicts, activities)
 
+    from douini.db.queries import notifications as nq
+
     for session, activity in matches:
         async with conn.cursor() as cur:
             await cur.execute(
                 "UPDATE plan_sessions SET status = 'review', garmin_activity_id = %s, "
-                "updated_at = NOW() WHERE plan_id = %s AND week = %s AND day = %s",
+                "updated_at = NOW() WHERE plan_id = %s AND week = %s AND day = %s "
+                "RETURNING id",
                 (activity["id"], plan_id, session["week"], session["day"]),
+            )
+            row = await cur.fetchone()
+            ps_id = row[0] if row else None
+        if ps_id is not None:
+            await nq.create_sync_notification(
+                conn,
+                user_id,
+                plan_id,
+                ps_id,
+                f"Activité Garmin matchée: {session.get('workout_name', 'séance')} "
+                f"(semaine {session['week']}, jour {session['day']})",
             )
 
     return {

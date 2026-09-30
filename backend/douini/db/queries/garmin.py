@@ -35,3 +35,9 @@ async def delete_garmin_token(conn: AsyncConnection, user_id: int) -> None:
 async def get_garmin_status(conn: AsyncConnection, user_id: int) -> dict[str, Any]:
     row = await get_garmin_token(conn, user_id)
     return {"connected": row is not None}
+
+
+async def list_garmin_connected_users(conn: AsyncConnection) -> list[int]:
+    async with conn.cursor() as cur:
+        await cur.execute("SELECT user_id FROM garmin_tokens ORDER BY user_id")
+        return [r[0] for r in await cur.fetchall()]

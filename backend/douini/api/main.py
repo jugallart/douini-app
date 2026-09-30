@@ -3,6 +3,8 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
+import asyncio
+
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,6 +13,7 @@ from fastapi.responses import JSONResponse
 from douini.api.dependencies import get_db
 from douini.api.routes import auth as auth_routes
 from douini.api.routes import garmin as garmin_routes
+from douini.api.routes import notifications as notifications_routes
 from douini.api.routes import plans as plans_routes
 from douini.api.routes import profile as profile_routes
 from douini.api.routes import race_results as race_results_routes
@@ -24,7 +27,11 @@ from douini.settings import configure_logging, settings
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     configure_logging()
     await open_pool()
+    from douini.services.sync_worker import run_sync_loop
+
+    sync_task = asyncio.create_task(run_sync_loop())
     yield
+    sync_task.cancel()
     await close_pool()
 
 
@@ -79,3 +86,4 @@ app.include_router(sessions_routes.router, prefix=settings.API_PREFIX)
 app.include_router(race_results_routes.router, prefix=settings.API_PREFIX)
 app.include_router(statistics_routes.router, prefix=settings.API_PREFIX)
 app.include_router(garmin_routes.router, prefix=settings.API_PREFIX)
+app.include_router(notifications_routes.router, prefix=settings.API_PREFIX)
