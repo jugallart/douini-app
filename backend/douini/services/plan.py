@@ -21,7 +21,7 @@ from douini.domain.models import (
     TrainingPlan,
     VolumeStrategy,
 )
-from douini.domain.planner import generate_plan
+from douini.domain.planner import generate_plan, regenerate_plan
 from douini.domain.vdot import derive_paces
 
 _EXP_MAP = {
@@ -303,3 +303,30 @@ async def get_plan_detail(
         "settings": row.get("settings_json", {}),
         "created_at": str(row.get("created_at")) if row.get("created_at") else None,
     }
+
+
+async def regenerate_plan_service(
+    conn: AsyncConnection, plan_id: int, user_id: int, from_week: int | None = None
+) -> dict[str, Any]:
+    row = await plans_q.get_plan(conn, plan_id, user_id)
+    if not row:
+        raise ValueError("Plan not found")
+
+    plan = await plan_from_row(conn, row)
+
+    if from_week is None:
+        sessions = row.get("sessions_json", [])
+        pending_weeks = [s["week"] for s in sessions if s.get("status") == "pending"]
+        if not pending_weeks:
+            raise ValueError("No pending sessions to regenerate")
+        from_week = min(pending_weeks)
+
+    regenerated = regenerate_plan(plan, from_week=from_week)
+    new_sessions_json = plan_to_json(regenerated)
+
+    await plans_q.update_plan_sessions_json(conn, plan_id, new_sessions_json)
+    await plans_q._materialize_plan_sessions(
+        conn, plan_id, new_sessions_json, row.get("start_date")
+    )
+
+    return {"plan_id": plan_id, "from_week": from_week}

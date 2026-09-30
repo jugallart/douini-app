@@ -166,3 +166,19 @@ async def get_pace_changes(
     old_vdot = adj.get("old_vdot") or plan["vdot"]
     new_vdot = adj.get("new_vdot") or plan["vdot"]
     return adjustment_svc.get_pace_changes(old_vdot, new_vdot)
+
+
+@router.post("/{plan_id}/regenerate")
+async def regenerate_plan(
+    plan_id: int,
+    data: dict | None = None,
+    user: dict = Depends(get_verified_user),
+    conn: AsyncConnection = Depends(get_db),
+):
+    from_week = (data or {}).get("from_week")
+    try:
+        result = await plan_svc.regenerate_plan_service(conn, plan_id, user["id"], from_week)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    await conn.commit()
+    return result
