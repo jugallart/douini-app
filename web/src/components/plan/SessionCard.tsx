@@ -9,7 +9,7 @@ const STATUS_COLORS: Record<string, string> = {
   review: "bg-yellow-100 text-yellow-700",
 };
 
-export function SessionCard({ session, onClick }: { session: PlanSession; onClick?: () => void }) {
+export function SessionCard({ session, onClick, detailed }: { session: PlanSession; onClick?: () => void; detailed?: boolean }) {
   const statusClass = STATUS_COLORS[session.status] ?? STATUS_COLORS.pending;
   return (
     <div
@@ -26,6 +26,17 @@ export function SessionCard({ session, onClick }: { session: PlanSession; onClic
         <span>{session.duration}</span>
       </div>
       {session.pace_label && <span className="text-xs text-brand-600">{session.pace_label}</span>}
+      {detailed && (
+        <dl className="mt-2 space-y-1.5 border-t border-gray-100 pt-2 text-xs text-gray-600">
+          {[
+            ["Structure", session.structure],
+            ["Objectif", session.goal],
+            ["Allure de référence", [session.pace || session.pace_label, session.distance_km > 0 && `${session.distance_km} km`].filter(Boolean).join(" · ")],
+          ].map(([k, v]) => v && (
+            <div key={k}><dt className="font-semibold text-gray-700">{k}</dt><dd>{v}</dd></div>
+          ))}
+        </dl>
+      )}
     </div>
   );
 }

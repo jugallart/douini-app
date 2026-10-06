@@ -132,7 +132,7 @@ export function Plan() {
             </div>
             <WeekGrid
               sessions={plan.sessions ?? []}
-              onSessionClick={(s) => setFeedbackSession(s)}
+              onSessionClick={(s) => (import.meta.env.DEV || s.status === "review") && setFeedbackSession(s)}
               weekActions={(week, ss) => {
                 const locked = isLocked(ss);
                 const title = locked ? "Semaine verrouillée (séances terminées ou sautées)" : undefined;

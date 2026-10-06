@@ -30,6 +30,7 @@ export interface PlanSession {
   goal: string;
   duration: string;
   pace_label: string;
+  pace?: string;
   status: string;
   id: number | null;
 }

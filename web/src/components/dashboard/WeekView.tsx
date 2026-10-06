@@ -14,7 +14,7 @@ export function WeekView({ sessions, onSessionClick }: { sessions: PlanSession[]
   return (
     <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
       {upcoming.map((s, i) => (
-        <SessionCard key={i} session={s} onClick={onSessionClick ? () => onSessionClick(s) : undefined} />
+        <SessionCard key={i} detailed session={s} onClick={onSessionClick ? () => onSessionClick(s) : undefined} />
       ))}
     </div>
   );

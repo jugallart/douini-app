@@ -10,8 +10,8 @@ export const plansApi = {
 
   get: (id: number) => apiFetch<PlanDetail>(`/plans/${id}`),
 
-  delete: (id: number) =>
-    apiFetch<{ status: string }>(`/plans/${id}`, { method: "DELETE" }),
+  delete: (id: number, garminCleanup = false) =>
+    apiFetch<{ status: string }>(`/plans/${id}${garminCleanup ? "?garmin_cleanup=true" : ""}`, { method: "DELETE" }),
 
   getRefreshProposal: (id: number) =>
     apiFetch<RefreshProposal>(`/plans/${id}/refresh-proposal`),

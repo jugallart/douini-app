@@ -165,7 +165,7 @@ export function Dashboard() {
           <h3 className="mb-3 text-sm font-semibold text-gray-700">Prochaines séances</h3>
           <WeekView
             sessions={sessions}
-            onSessionClick={(s) => s.id != null && setTarget({ id: s.id, status: s.status, title: s.workout || s.type })}
+            onSessionClick={(s) => import.meta.env.DEV && s.id != null && setTarget({ id: s.id, status: s.status, title: s.workout || s.type })}
           />
         </Card>
       </div>

@@ -9,6 +9,7 @@ from douini.db.queries import plans as plans_q
 from douini.db.queries import profile as profile_q
 from douini.db.queries import sessions as sessions_q
 from douini.domain.models import SessionFeedback
+from douini.settings import settings
 from douini.domain.vdot import evaluate_feedback, get_workout_zone, recalibrate_vdot
 
 _PACE_ACTIONS = {"recalibrate_vdot", "local_progression_trial", "monitor_difficulty"}
@@ -31,6 +32,8 @@ async def process_feedback(
 
     if session["status"] not in ("completed", "pending", "skipped"):
         raise ValueError("Invalid session status")
+    if session["status"] in ("pending", "skipped") and settings.ENVIRONMENT != "dev":
+        raise ValueError("Feedback only after Garmin sync")
 
     is_quality = session.get("type") == "quality"
 

@@ -22,7 +22,7 @@ from douini.domain.models import (
     TrainingPlan,
     VolumeStrategy,
 )
-from douini.domain.planner import generate_plan, regenerate_plan
+from douini.domain.planner import build_workout, generate_plan, regenerate_plan
 from douini.domain.vdot import derive_paces
 
 _EXP_MAP = {
@@ -57,7 +57,7 @@ def _session_display(session: Session) -> dict[str, str]:
         goal = _ZONE_GOALS.get(session.pace_key or "", "")
         pace_label = _ZONE_LABELS.get(session.pace_key or "", "")
         duration = "variable"
-    elif t in ("long_run",):
+    elif t in ("long_run", "long"):
         structure = f"{session.distance_km:.0f} km en endurance"
         goal = _ZONE_GOALS.get("long_run", "")
         pace_label = _ZONE_LABELS.get("long_run", "")
@@ -68,6 +68,18 @@ def _session_display(session: Session) -> dict[str, str]:
         pace_label = _ZONE_LABELS.get(t, "")
         duration = f"{session.distance_km * 6:.0f} min"
     return {"structure": structure, "goal": goal, "duration": duration, "pace_label": pace_label}
+
+
+def _fmt_pace(sec: int) -> str:
+    return f"{sec // 60}'{sec % 60:02d}\""
+
+
+def _quality_pace(s: Session) -> str:
+    wd = s.workout
+    if s.type != "quality" or not hasattr(wd, "pace_min"):
+        return ""
+    lo, hi = wd.pace_min.s_per_km, wd.pace_max.s_per_km
+    return f"{_fmt_pace(lo)}/km" if lo == hi else f"{_fmt_pace(lo)}-{_fmt_pace(hi)}/km"
 
 
 def plan_to_json(plan: TrainingPlan) -> str:
@@ -90,6 +102,7 @@ def plan_to_json(plan: TrainingPlan) -> str:
                 "goal": disp["goal"],
                 "duration": disp["duration"],
                 "pace_label": disp["pace_label"],
+                "pace": _quality_pace(s),
                 "status": s.status.value if hasattr(s.status, "value") else str(s.status),
                 "id": s.id,
             })
@@ -149,7 +162,7 @@ async def plan_from_row(conn: AsyncConnection, row: dict[str, Any]) -> TrainingP
     for s in sessions_json:
         sess = Session(
             day=s["day"],
-            workout=s.get("workout"),
+            workout=build_workout(s["workout"], paces) if s.get("workout") else None,
             type=s.get("type", "easy"),
             structure=s.get("structure", ""),
             distance_km=s.get("distance_km", 0),

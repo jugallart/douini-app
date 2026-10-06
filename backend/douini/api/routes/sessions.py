@@ -9,6 +9,7 @@ from douini.api.dependencies import get_db, get_verified_user
 from douini.db.queries import plans as plans_q
 from douini.db.queries import sessions as sessions_q
 from douini.services import feedback as feedback_svc
+from douini.settings import settings
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
 
@@ -53,6 +54,8 @@ async def patch_session(
             raise HTTPException(404, "Session not found")
 
     status = data.get("status")
+    if status == "completed" and session["status"] == "pending" and settings.ENVIRONMENT != "dev":
+        raise HTTPException(403, "Session completes via Garmin sync only")
     if status:
         updated = await sessions_q.update_session_status(conn, session_id, status)
 

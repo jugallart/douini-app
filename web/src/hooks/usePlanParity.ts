@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { plansApi, garminApi, type PlanSession } from "@douini/shared";
+import { plansApi, type PlanSession } from "@douini/shared";
 
 export function useEditWeek() {
   const qc = useQueryClient();
@@ -22,10 +22,7 @@ export function useDeletePlan() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ planId, withGarmin }: { planId: number; withGarmin: boolean }) => {
-      // Garmin first: the backend needs the plan's sessions to find workout ids.
-      const garmin = withGarmin ? await garminApi.deleteWorkouts(planId) : null;
-      await plansApi.delete(planId);
-      return garmin;
+      await plansApi.delete(planId, withGarmin);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["plans"] });

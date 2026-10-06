@@ -31,6 +31,11 @@ services:
       SMTP_FROM: ${SMTP_FROM:-noreply@douini.run}
       FRONTEND_URL: ${FRONTEND_URL:-https://douini.run}
       DOUINI_ENCRYPTION_KEY: ${DOUINI_ENCRYPTION_KEY}
+    networks:
+      default:
+      edge:
+        aliases:
+          - backend-${ENV_NAME:-prod}
     depends_on:
       postgres:
         condition: service_healthy
@@ -40,9 +45,16 @@ services:
     build:
       context: ..
       dockerfile: infra/Dockerfile.web
+    networks:
+      default:
+      edge:
+        aliases:
+          - web-${ENV_NAME:-prod}
     restart: unless-stopped
 
   caddy:
+    profiles: [edge]  # prod stack only; ppe reuses it via the shared "edge" network
+    networks: [edge]
     image: caddy:2-alpine
     ports:
       - "80:80"
@@ -53,10 +65,12 @@ services:
       - caddy_config:/config
     environment:
       CADDY_HOST: ${CADDY_HOST:-localhost}
-    depends_on:
-      - backend
-      - web
+      CADDY_HOST_PPE: ${CADDY_HOST_PPE:-ppe.localhost}
     restart: unless-stopped
+
+networks:
+  edge:
+    external: true
 
 volumes:
   pgdata:
