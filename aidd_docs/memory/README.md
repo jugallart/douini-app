@@ -17,11 +17,11 @@ The root files load every session through the project memory block in each AI co
 Refreshed automatically by the memory hook. Do not edit by hand.
 
 <!-- files:start -->
-- `architecture.md` — monorepo layout, domain engine, backend layers, database, auth, frontend, Garmin
-- `backend.md` — Python stack, running locally, API structure, key files, gotchas
-- `frontend.md` — Web (React/Vite) and mobile (Expo) structure, shared package
-- `deployment.md` — Docker, Caddy, CI/CD, data migration, backup/restore
-- `decisions.md` — 16 recorded decisions with rationale and status
+- [architecture.md](architecture.md)
+- [backend.md](backend.md)
+- [decisions.md](decisions.md)
+- [deployment.md](deployment.md)
+- [frontend.md](frontend.md)
 <!-- files:end -->
 
 ## Maintaining it

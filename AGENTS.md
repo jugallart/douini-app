@@ -37,13 +37,15 @@ Project docs, memory, specs, and plans live in `aidd_docs/`.
 
 ### Project memory
 
-<aidd_project_memory>
-architecture.md: Monorepo (backend FastAPI + web React + mobile Expo + @douini/shared). Domain engine copied read-only from douini-run. PostgreSQL 16 + psycopg3 async. 410 domain tests.
-backend.md: Python 3.14, FastAPI, psycopg3, Alembic, JWT auth. Routes: auth, profile, plans, sessions, race_results, statistics, garmin. bcrypt direct (not passlib). JSONB gotcha: psycopg3 auto-deserializes.
-frontend.md: Web React 19 + Vite 6 + Tailwind 3.4 + TanStack Query 5. Mobile Expo SDK 53 + expo-router 4. Shared TS package with apiFetch + types. Wizard: 4 steps → PUT profile + POST plan.
-deployment.md: Docker compose (postgres+backend+web+caddy). CI: GitHub Actions (pytest + tsc). Deploy: ghcr.io + SSH. Migration script: SQLite→PG.
-decisions.md: 16 decisions recorded. Key changes from plan: bcrypt direct, email verification auto-skipped in dev.
-</aidd_project_memory>
+<!-- aidd_project_memory:start -->
+
+[aidd_docs/memory/architecture.md](aidd_docs/memory/architecture.md)
+[aidd_docs/memory/backend.md](aidd_docs/memory/backend.md)
+[aidd_docs/memory/decisions.md](aidd_docs/memory/decisions.md)
+[aidd_docs/memory/deployment.md](aidd_docs/memory/deployment.md)
+[aidd_docs/memory/frontend.md](aidd_docs/memory/frontend.md)
+
+<!-- aidd_project_memory:end -->
 
 - If the block above is empty, run `ls -1tr aidd_docs/memory/` and read each file.
 - Load `aidd_docs/memory/external/*` when the user asks.
