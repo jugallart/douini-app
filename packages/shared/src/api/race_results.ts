@@ -5,6 +5,8 @@ export const raceResultsApi = {
   add: (payload: RaceResultPayload) =>
     apiFetch<RaceResult>("/race-results", { method: "POST", body: JSON.stringify(payload) }),
 
+  get: (id: number) => apiFetch<RaceResult>(`/race-results/${id}`),
+
   list: () => apiFetch<RaceResult[]>("/race-results"),
 
   delete: (id: number) =>

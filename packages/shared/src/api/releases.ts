@@ -8,4 +8,7 @@ export const releasesApi = {
 
   markRead: (version: string) =>
     apiFetch<{ ok: boolean }>(`/releases/${version}/read`, { method: "POST" }),
+
+  markAllRead: () =>
+    apiFetch<{ ok: boolean; marked: number }>("/releases/read-all", { method: "POST" }),
 };

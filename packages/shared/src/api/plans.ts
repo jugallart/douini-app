@@ -1,5 +1,5 @@
 import { apiFetch } from "./client";
-import type { PlanSummary, PlanDetail, PlanGeneratePayload, RefreshProposal, RegenerateResult } from "../types/plan";
+import type { PlanSummary, PlanDetail, PlanGeneratePayload, RefreshProposal, RegenerateResult, ReviewQueueItem, PlanSession } from "../types/plan";
 import type { Celebration } from "../types/celebration";
 
 export const plansApi = {
@@ -30,4 +30,28 @@ export const plansApi = {
 
   regenerate: (id: number, fromWeek?: number) =>
     apiFetch<RegenerateResult>(`/plans/${id}/regenerate`, { method: "POST", body: JSON.stringify({ from_week: fromWeek }) }),
+
+  reviewQueue: (id: number) =>
+    apiFetch<ReviewQueueItem[]>(`/plans/${id}/review-queue`),
+
+  rejectAdjustment: (id: number, adjustmentId: number) =>
+    apiFetch<{ id: number; status: string; restored: boolean; vdot_reverted?: number }>(`/plans/${id}/adjustments/${adjustmentId}/reject`, { method: "POST" }),
+
+  restore: (id: number) =>
+    apiFetch<Record<string, unknown>>(`/plans/${id}/adjustments/restore`, { method: "POST" }),
+
+  syncAdjustmentGarmin: (id: number, adjustmentId: number) =>
+    apiFetch<Record<string, unknown>>(`/plans/${id}/adjustments/${adjustmentId}/sync-garmin`, { method: "POST" }),
+
+  paceChanges: (id: number, adjustmentId: number) =>
+    apiFetch<Record<string, unknown>>(`/plans/${id}/adjustments/${adjustmentId}/pace-changes`),
+
+  adjustments: (id: number) =>
+    apiFetch<Record<string, unknown>[]>(`/plans/${id}/adjustments`),
+
+  editWeek: (id: number, week: number, sessions: Partial<PlanSession>[]) =>
+    apiFetch<{ status: string; week: number }>(`/plans/${id}/weeks/${week}`, { method: "PUT", body: JSON.stringify({ sessions }) }),
+
+  deleteWeek: (id: number, week: number) =>
+    apiFetch<{ status: string }>(`/plans/${id}/weeks/${week}`, { method: "DELETE" }),
 };

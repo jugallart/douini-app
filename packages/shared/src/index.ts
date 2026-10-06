@@ -14,7 +14,7 @@ export { apiFetch, configureClient, getApiBaseUrl, setApiBaseUrl } from "./api/c
 export type { TokenStorage } from "./api/client";
 export { authApi } from "./api/auth";
 export { plansApi } from "./api/plans";
-export { profileApi } from "./api/profile";
+export { profileApi, accountApi } from "./api/profile";
 export { sessionsApi } from "./api/sessions";
 export { garminApi } from "./api/garmin";
 export { raceResultsApi } from "./api/race_results";

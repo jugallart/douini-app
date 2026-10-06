@@ -71,3 +71,13 @@ export interface RegenerateResult {
   plan_id: number;
   from_week: number;
 }
+
+export interface ReviewQueueItem {
+  id: number;
+  week: number;
+  day: string;
+  workout_name: string | null;
+  distance_km: number;
+  garmin_activity_id: string | null;
+  scheduled_date: string | null;
+}

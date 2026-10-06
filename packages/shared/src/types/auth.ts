@@ -2,6 +2,8 @@ export interface User {
   id: number;
   email: string;
   email_verified: boolean;
+  pseudo: string | null;
+  prenom: string | null;
 }
 
 export interface AuthTokens {

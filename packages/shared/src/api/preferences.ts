@@ -6,4 +6,7 @@ export const preferencesApi = {
 
   update: (prefs: Partial<UserPreferences>) =>
     apiFetch<UserPreferences>("/preferences", { method: "PUT", body: JSON.stringify(prefs) }),
+
+  setIntervalUnit: (useDistance: boolean) =>
+    apiFetch<{ ok: boolean }>("/preferences/interval-unit", { method: "POST", body: JSON.stringify({ use_distance: useDistance }) }),
 };

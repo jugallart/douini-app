@@ -16,6 +16,12 @@ export const garminApi = {
   deleteWorkouts: (planId: number) =>
     apiFetch<{ deleted: number; failed: number }>(`/garmin/workouts/${planId}`, { method: "DELETE" }),
 
+  autoPush: (planId: number, week: number, force?: boolean) =>
+    apiFetch<GarminPushResult>(`/garmin/auto-push/${planId}`, { method: "POST", body: JSON.stringify({ week, force }) }),
+
+  autoSync: (planId: number) =>
+    apiFetch<GarminSyncResult>(`/garmin/auto-sync/${planId}`, { method: "POST" }),
+
   disconnect: () =>
     apiFetch<{ status: string }>("/garmin/disconnect", { method: "DELETE" }),
 };
