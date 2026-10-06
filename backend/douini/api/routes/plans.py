@@ -160,6 +160,18 @@ async def sync_adjustment_garmin(
     return result
 
 
+@router.get("/{plan_id}/adjustments")
+async def list_adjustments(
+    plan_id: int,
+    user: dict = Depends(get_verified_user),
+    conn: AsyncConnection = Depends(get_db),
+):
+    plan = await plans_q.get_plan(conn, plan_id, user["id"])
+    if not plan:
+        raise HTTPException(404, "Plan not found")
+    return await plans_q.get_applied_adjustments(conn, plan_id)
+
+
 @router.get("/{plan_id}/adjustments/{adjustment_id}/pace-changes")
 async def get_pace_changes(
     plan_id: int,
@@ -239,7 +251,7 @@ async def edit_week(
         raise HTTPException(409, f"Cannot edit locked sessions: {locked_in_week & new_days}")
 
     sessions_json = plan.get("sessions_json", [])
-    sessions_json = [s for s in sessions_json if s["week"] != week]
+    sessions_json = [s for s in sessions_json if s["week"] != week or s["day"] in locked_in_week]
     for s in data.get("sessions", []):
         s["week"] = week
         sessions_json.append(s)
@@ -251,8 +263,8 @@ async def edit_week(
     start_date = plan.get("start_date")
     async with conn.cursor() as cur:
         await cur.execute(
-            "DELETE FROM plan_sessions WHERE plan_id = %s AND week = %s",
-            (plan_id, week),
+            "DELETE FROM plan_sessions WHERE plan_id = %s AND week = %s AND day <> ALL(%s)",
+            (plan_id, week, list(locked_in_week)),
         )
         for s in data.get("sessions", []):
             if start_date:

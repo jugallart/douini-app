@@ -16,6 +16,12 @@ from douini.domain.models import RefreshProposal
 async def get_refresh_proposal(
     conn: AsyncConnection, plan_id: int, user_id: int
 ) -> dict[str, Any] | None:
+    existing = await plans_q.get_refresh_state(conn, plan_id)
+    if existing and existing.get("status") in ("declined", "accepted"):
+        return None
+    if existing and existing.get("status") == "pending":
+        return existing.get("proposal_json")
+
     if not await plans_q.is_plan_complete(conn, plan_id):
         return None
 

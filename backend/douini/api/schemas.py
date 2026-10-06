@@ -46,6 +46,12 @@ class RunnerProfileOut(BaseModel):
     volume_strategy: str = "progressive"
 
 
+class UserIdentityIn(BaseModel):
+    pseudo: str | None = None
+    prenom: str | None = None
+    nom: str | None = None
+
+
 class ProfileCompletenessOut(BaseModel):
     model_config = {"from_attributes": True}
     complete: bool

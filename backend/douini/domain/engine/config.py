@@ -8,7 +8,7 @@ from importlib import resources
 
 
 def _load_json(filename: str) -> dict:
-    pkg = resources.files("douini_run.engine.data")
+    pkg = resources.files("douini.domain.engine.data")
     return json.loads((pkg / filename).read_text(encoding="utf-8"))
 
 

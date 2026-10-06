@@ -34,7 +34,7 @@ _WORKOUT_FILES = ["common.json", "norwegian.json", "5k.json", "10k.json", "half.
 
 
 def _load_json(filename: str) -> dict:
-    pkg = resources.files("douini_run.engine.workouts")
+    pkg = resources.files("douini.domain.engine.workouts")
     return json.loads((pkg / filename).read_text(encoding="utf-8"))
 
 

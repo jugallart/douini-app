@@ -76,8 +76,9 @@ async def auto_push(
     week = data.get("week")
     if not week:
         raise HTTPException(400, "week required")
+    force = data.get("force", False)
     try:
-        result = await auto_push_week(conn, plan_id, user["id"], week)
+        result = await auto_push_week(conn, plan_id, user["id"], week, force=force)
     except ValueError as e:
         raise HTTPException(404, str(e))
     except Exception as e:

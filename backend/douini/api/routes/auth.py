@@ -222,4 +222,6 @@ async def me(user: dict = Depends(get_current_user)):
         "id": user["id"],
         "email": user["email"],
         "email_verified": user["email_verified"],
+        "pseudo": user.get("pseudo"),
+        "prenom": user.get("prenom"),
     }

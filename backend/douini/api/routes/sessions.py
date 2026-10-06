@@ -94,5 +94,9 @@ async def adjust_session(
     user: dict = Depends(get_verified_user),
     conn: AsyncConnection = Depends(get_db),
 ):
-    # ponytail: minimal stub, full adjustment logic in feedback service
-    raise HTTPException(501, "Not implemented")
+    try:
+        result = await feedback_svc.process_feedback(conn, session_id, data, user["id"])
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    await conn.commit()
+    return result

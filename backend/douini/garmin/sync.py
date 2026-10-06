@@ -97,14 +97,15 @@ async def push_plan_sessions_to_garmin(
 
 
 async def auto_push_week(
-    conn: AsyncConnection, plan_id: int, user_id: int, week: int
+    conn: AsyncConnection, plan_id: int, user_id: int, week: int, *, force: bool = False
 ) -> dict[str, Any]:
     pushed = await plans_q.get_auto_pushed_week(conn, plan_id)
-    if pushed is not None and pushed >= week:
+    if not force and pushed is not None and pushed >= week:
         return {"status": "already_pushed", "week": pushed}
 
     result = await push_plan_sessions_to_garmin(conn, plan_id, user_id, week=week)
-    await plans_q.set_auto_pushed_week(conn, plan_id, week)
+    if force or pushed is None or week > pushed:
+        await plans_q.set_auto_pushed_week(conn, plan_id, week)
     return result
 
 
