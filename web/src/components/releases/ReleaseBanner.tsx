@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router";
 import { useUnreadReleases, useMarkReleaseRead } from "../../hooks/useReleases";
 
 export function ReleaseBanner() {
@@ -20,7 +21,12 @@ export function ReleaseBanner() {
         <ul className="mb-4 list-disc space-y-1 pl-5 text-sm text-gray-700">
           {latest.items.map((item, i) => <li key={i}>{item}</li>)}
         </ul>
-        {remaining > 0 && <p className="mb-3 text-xs text-gray-400">+{remaining} autre(s) version(s) non lue(s).</p>}
+        {remaining > 0 && (
+          <p className="mb-3 text-xs text-gray-400">
+            +{remaining} autre(s) version(s) non lue(s).{" "}
+            <Link to="/releases" className="text-brand-600 hover:underline" onClick={() => setOpen(false)}>Voir l'historique</Link>
+          </p>
+        )}
         <button
           className="w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
           onClick={async () => { await markRead.mutateAsync(latest.version); setOpen(false); }}

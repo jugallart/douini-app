@@ -13,5 +13,17 @@ export function usePreferences() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["preferences"] }),
   });
 
-  return { preferences: data, isLoading, updatePreferences: update.mutateAsync, isUpdating: update.isPending };
+  // Backend stores interval unit as metric_units = !use_distance and rewrites plans.
+  const intervalUnit = useMutation({
+    mutationFn: (useDistance: boolean) => preferencesApi.setIntervalUnit(useDistance),
+    onSuccess: () => qc.invalidateQueries(), // plans rewritten too
+  });
+
+  return {
+    preferences: data,
+    isLoading,
+    updatePreferences: update.mutateAsync,
+    isUpdating: update.isPending || intervalUnit.isPending,
+    setIntervalUnit: intervalUnit.mutateAsync,
+  };
 }

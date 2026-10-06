@@ -11,6 +11,7 @@ import { Plan } from "./pages/Plan";
 import { Profile } from "./pages/Profile";
 import { Pantheon } from "./pages/Pantheon";
 import { Settings } from "./pages/Settings";
+import { Releases } from "./pages/Releases";
 import { NotFound } from "./pages/NotFound";
 
 function Protected({ children }: { children: React.ReactNode }) {
@@ -30,5 +31,6 @@ export const router = createBrowserRouter([
   { path: "/profile", element: <Protected><Profile /></Protected> },
   { path: "/pantheon", element: <Protected><Pantheon /></Protected> },
   { path: "/settings", element: <Protected><Settings /></Protected> },
+  { path: "/releases", element: <Protected><Releases /></Protected> },
   { path: "*", element: <NotFound /> },
 ]);

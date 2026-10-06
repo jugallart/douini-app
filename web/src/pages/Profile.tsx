@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useProfile } from "../hooks/useProfile";
-import type { RunnerProfile } from "@douini/shared";
+import { useAuth } from "../hooks/useAuth";
+import { accountApi, type RunnerProfile } from "@douini/shared";
 import { AppShell } from "../components/layout/AppShell";
 import { Card } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
@@ -16,12 +18,36 @@ export function Profile() {
   const { profile, isLoading, updateProfile, isUpdating } = useProfile();
   const [form, setForm] = useState<Partial<RunnerProfile>>({});
   const [saved, setSaved] = useState(false);
+  const { user, logout } = useAuth();
+  const qc = useQueryClient();
+  const [identity, setIdentity] = useState({ pseudo: "", prenom: "" });
+  const [identitySaved, setIdentitySaved] = useState(false);
+  const updateIdentity = useMutation({
+    mutationFn: (data: { pseudo?: string; prenom?: string }) => accountApi.updateIdentity(data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["me"] }); setIdentitySaved(true); setTimeout(() => setIdentitySaved(false), 2000); },
+  });
+
+  useEffect(() => {
+    if (user) setIdentity({ pseudo: user.pseudo ?? "", prenom: user.prenom ?? "" });
+  }, [user]);
+  const resetData = useMutation({
+    mutationFn: accountApi.resetData,
+    onSuccess: () => qc.invalidateQueries(),
+  });
+  const deleteAccount = useMutation({
+    mutationFn: accountApi.delete,
+    onSuccess: logout, // clears tokens + redirects to /login
+  });
 
   useEffect(() => {
     if (profile) setForm(profile);
   }, [profile]);
 
   if (isLoading) return <AppShell><Card>Chargement…</Card></AppShell>;
+
+  async function handleSaveIdentity() {
+    await updateIdentity.mutateAsync(identity);
+  }
 
   function set<K extends keyof RunnerProfile>(key: K, value: RunnerProfile[K] | null) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -42,6 +68,18 @@ export function Profile() {
     <AppShell>
       <div className="space-y-4">
         {saved && <Alert type="success">Profil mis à jour.</Alert>}
+        <Card>
+          <h2 className="mb-4 text-lg font-semibold">Identité</h2>
+          {identitySaved && <Alert type="success">Identité mise à jour.</Alert>}
+          {updateIdentity.error && <Alert>{(updateIdentity.error as Error).message}</Alert>}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Input label="Pseudo" value={identity.pseudo} onChange={(e) => setIdentity((p) => ({ ...p, pseudo: e.target.value }))} />
+            <Input label="Prénom" value={identity.prenom} onChange={(e) => setIdentity((p) => ({ ...p, prenom: e.target.value }))} />
+          </div>
+          <div className="mt-4">
+            <Button loading={updateIdentity.isPending} onClick={handleSaveIdentity}>Enregistrer</Button>
+          </div>
+        </Card>
         <Card>
           <h2 className="mb-4 text-lg font-semibold">Profil du coureur</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -81,6 +119,27 @@ export function Profile() {
           </div>
           <div className="mt-6">
             <Button loading={isUpdating} onClick={handleSave}>Enregistrer</Button>
+          </div>
+        </Card>
+        <Card>
+          <h2 className="mb-4 text-lg font-semibold">Gestion des données</h2>
+          {resetData.isSuccess && <Alert type="success">Données supprimées.</Alert>}
+          {(resetData.error || deleteAccount.error) && <Alert>{((resetData.error || deleteAccount.error) as Error).message}</Alert>}
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="secondary"
+              loading={resetData.isPending}
+              onClick={() => confirm("Supprimer toutes mes données ? Vos plans, séances et résultats seront supprimés. Action irréversible.") && resetData.mutate()}
+            >
+              Supprimer mes données
+            </Button>
+            <Button
+              variant="danger"
+              loading={deleteAccount.isPending}
+              onClick={() => confirm("Supprimer mon compte ? Votre compte et toutes vos données seront supprimés. Action irréversible.") && deleteAccount.mutate()}
+            >
+              Supprimer mon compte
+            </Button>
           </div>
         </Card>
       </div>

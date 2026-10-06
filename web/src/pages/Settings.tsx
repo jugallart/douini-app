@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Link } from "react-router";
+import type { UserPreferences } from "@douini/shared";
 import { useGarminStatus, useGarminConnect, useGarminDisconnect, useGarminPush, useGarminSync, useGarminDeleteWorkouts } from "../hooks/useGarmin";
 import { usePreferences } from "../hooks/usePreferences";
 import { usePlans } from "../hooks/usePlan";
@@ -17,15 +19,19 @@ export function Settings() {
   const deleteWorkouts = useGarminDeleteWorkouts();
   const { data: plans } = usePlans();
   const activePlan = plans?.find((p) => p.status === "active") ?? plans?.[0];
-  const { preferences, updatePreferences, isUpdating } = usePreferences();
+  const { preferences, updatePreferences, isUpdating, setIntervalUnit } = usePreferences();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
   const [prefsMsg, setPrefsMsg] = useState("");
 
   async function handleConnect() {
-    await connect.mutateAsync({ email, password });
-    setMsg("Garmin connecté.");
+    try {
+      await connect.mutateAsync({ email, password });
+      setMsg("Garmin connecté.");
+    } catch {
+      // shown via connect.error
+    }
   }
 
   async function handlePush() {
@@ -46,13 +52,14 @@ export function Settings() {
     setMsg(`${r.deleted} workouts supprimés, ${r.failed} échecs.`);
   }
 
-  async function handlePrefs() {
-    await updatePreferences({
-      metric_units: preferences?.metric_units ?? true,
-      notifications: preferences?.notifications ?? true,
-      long_run_reminder: preferences?.long_run_reminder ?? false,
-    });
+  async function savePref(prefs: Partial<UserPreferences>) {
+    await updatePreferences(prefs);
     setPrefsMsg("Préférences enregistrées.");
+  }
+
+  async function handleIntervalUnit(useDistance: boolean) {
+    await setIntervalUnit(useDistance);
+    setPrefsMsg("Unité des intervalles mise à jour, plan recalculé.");
   }
 
   return (
@@ -64,19 +71,19 @@ export function Settings() {
           {prefsMsg && <Alert type="success">{prefsMsg}</Alert>}
           <div className="space-y-3">
             <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={preferences?.metric_units ?? true} onChange={(e) => updatePreferences({ metric_units: e.target.checked })} />
-              Unités métriques
+              <input type="checkbox" disabled={isUpdating} checked={!(preferences?.metric_units ?? true)} onChange={(e) => handleIntervalUnit(e.target.checked)} />
+              Intervalles en distance
             </label>
             <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={preferences?.notifications ?? true} onChange={(e) => updatePreferences({ notifications: e.target.checked })} />
+              <input type="checkbox" disabled={isUpdating} checked={preferences?.notifications ?? true} onChange={(e) => savePref({ notifications: e.target.checked })} />
               Notifications
             </label>
             <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={preferences?.long_run_reminder ?? false} onChange={(e) => updatePreferences({ long_run_reminder: e.target.checked })} />
+              <input type="checkbox" disabled={isUpdating} checked={preferences?.long_run_reminder ?? false} onChange={(e) => savePref({ long_run_reminder: e.target.checked })} />
               Rappel sortie longue
             </label>
-            <Button onClick={handlePrefs} loading={isUpdating}>Enregistrer</Button>
           </div>
+          <Link to="/releases" className="mt-4 inline-block text-sm text-brand-600 hover:underline">Voir les nouveautés</Link>
         </Card>
         <Card>
           <h2 className="mb-4 text-lg font-semibold">Garmin</h2>
@@ -90,6 +97,7 @@ export function Settings() {
             </div>
           ) : (
             <div className="space-y-3">
+              {connect.error && <Alert>Erreur : {connect.error.message}</Alert>}
               <Input label="Email Garmin" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
               <Input label="Mot de passe Garmin" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
               <Button onClick={handleConnect} loading={connect.isPending}>Connecter</Button>

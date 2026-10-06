@@ -1,7 +1,12 @@
+import type { ReactNode } from "react";
 import type { PlanSession } from "@douini/shared";
 import { SessionCard } from "./SessionCard";
 
-export function WeekGrid({ sessions, onSessionClick }: { sessions: PlanSession[]; onSessionClick?: (s: PlanSession) => void }) {
+export function WeekGrid({ sessions, onSessionClick, weekActions }: {
+  sessions: PlanSession[];
+  onSessionClick?: (s: PlanSession) => void;
+  weekActions?: (week: number, sessions: PlanSession[]) => ReactNode;
+}) {
   const weeks = [...new Set(sessions.map((s) => s.week))].sort((a, b) => a - b);
   const currentWeek = weeks.length > 0 ? Math.ceil(weeks.length / 2) : 0;
 
@@ -23,6 +28,7 @@ export function WeekGrid({ sessions, onSessionClick }: { sessions: PlanSession[]
                 </span>
               )}
             </div>
+            {weekActions && <div className="mb-2 flex flex-wrap gap-2">{weekActions(week, weekSessions)}</div>}
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
               {weekSessions.map((s, i) => (
                 <SessionCard key={i} session={s} onClick={onSessionClick ? () => onSessionClick(s) : undefined} />

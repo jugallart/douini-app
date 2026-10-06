@@ -32,6 +32,14 @@ export function Pantheon() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["race-results"] }),
   });
 
+  // Legacy chart: derived_vdot over race_date, dated races with a VDOT only.
+  const progression = (results ?? [])
+    .filter((r) => r.race_date && r.derived_vdot != null)
+    .sort((a, b) => a.race_date!.localeCompare(b.race_date!));
+  const vdots = progression.map((r) => r.derived_vdot!);
+  const minVdot = Math.min(...vdots);
+  const maxVdot = Math.max(...vdots);
+
   return (
     <AppShell>
       <div className="space-y-4">
@@ -85,7 +93,7 @@ export function Pantheon() {
                     <td className="py-2">{r.derived_vdot?.toFixed(1) ?? "—"}</td>
                     <td className="py-2">{r.location || "—"}</td>
                     <td className="py-2 text-right">
-                      <button onClick={() => deleteMutation.mutate(r.id)} className="text-xs text-red-500 hover:text-red-700">Supprimer</button>
+                      <button onClick={() => confirm("Supprimer cette course ? Action irréversible.") && deleteMutation.mutate(r.id)} className="text-xs text-red-500 hover:text-red-700">Supprimer</button>
                     </td>
                   </tr>
                 ))}
@@ -96,21 +104,17 @@ export function Pantheon() {
           <Card className="text-center text-gray-500">Aucune course enregistrée.</Card>
         )}
 
-        {results && results.length > 1 && (
+        {progression.length > 1 && (
           <Card>
             <h3 className="mb-3 text-sm font-semibold text-gray-700">Progression VDOT</h3>
-            <div className="flex items-end gap-2" style={{ height: 120 }}>
-              {results.map((r) => {
-                const vdot = r.derived_vdot ?? 0;
-                const maxVdot = Math.max(...results.map((x) => x.derived_vdot ?? 0), 1);
-                const h = Math.max(4, (vdot / maxVdot) * 100);
-                return (
-                  <div key={r.id} className="flex flex-col items-center" style={{ width: 40 }}>
-                    <div className="w-6 rounded-t bg-brand-500" style={{ height: `${h}%` }} />
-                    <span className="mt-1 text-xs text-gray-500">{vdot.toFixed(0)}</span>
-                  </div>
-                );
-              })}
+            <div className="flex items-end gap-2 overflow-x-auto" style={{ height: 140 }}>
+              {progression.map((r) => (
+                <div key={r.id} className="flex h-full flex-col items-center justify-end" style={{ minWidth: 48 }}>
+                  <span className="text-xs text-gray-700">{r.derived_vdot!.toFixed(1)}</span>
+                  <div className="w-6 rounded-t bg-brand-500" style={{ height: `${Math.max(4, ((r.derived_vdot! - minVdot) / (maxVdot - minVdot || 1)) * 80 + 4)}%` }} />
+                  <span className="mt-1 text-[10px] text-gray-500">{r.race_date}</span>
+                </div>
+              ))}
             </div>
           </Card>
         )}
